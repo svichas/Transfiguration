@@ -101,3 +101,11 @@ result:
 </body>
 </html>
 ```
+
+##Exporting code
+
+```php
+print $transfiguration->exportHtml();
+```
+
+
