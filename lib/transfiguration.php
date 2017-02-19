@@ -51,7 +51,7 @@ class transfiguration {
 
 
   #function to replace blocks with data
-  public function block($blockName, $values, $withbraces=true, $caseSensitive=false) {
+  public function block($blockName, $values, $withbraces=true, $caseSensitive=false, $xss = false) {
 
     #block names
     $endBlockName = ($withbraces) ? "{{/".$blockName."}}" : "/".$blockName;
@@ -72,9 +72,12 @@ class transfiguration {
         foreach ($value_keys as $key) {
           #node
           $node = ($withbraces) ? "{{".$key."}}" : $key;
+
+          $val = ($xss) ? htmlspecialchars($value[$key],ENT_QUOTES) : $value[$key];
+
           #replacing tags with values and checking for $caseSensitive
-          if ($caseSensitive) $string = str_replace($node,$value[$key],$string);
-          else $string = str_ireplace($node,$value[$key],$string);
+          if ($caseSensitive) $string = str_replace($node,$val,$string);
+          else $string = str_ireplace($node,$val,$string);
 
           //$string = ($caseSensitive) ? str_replace($node,$value[$key],$string) : str_ireplace($node,$value[$key],$string);
 
@@ -89,11 +92,14 @@ class transfiguration {
 
 
   #function to replace values from the html with data
-  public function replaceValues($values = [], $withbraces=true, $caseSensitive=false) {
+  public function replaceValues($values = [], $withbraces=true, $caseSensitive=false, $xss = false) {
     $val_keys = array_keys($values);
     foreach ($val_keys as $val_key) {
-      if ($caseSensitive) $this->html = str_replace(($withbraces==true) ? "{{".$val_key."}}" : $val_key,$values[$val_key],$this->html);
-      else $this->html = str_ireplace(($withbraces==true) ? "{{".$val_key."}}" : $val_key,$values[$val_key],$this->html);
+
+      $val = ($xss) ? htmlspecialchars($values[$val_key], ENT_QUOTES) : $values[$val_key];
+
+      if ($caseSensitive) $this->html = str_replace(($withbraces==true) ? "{{".$val_key."}}" : $val_key,$val,$this->html);
+      else $this->html = str_ireplace(($withbraces==true) ? "{{".$val_key."}}" : $val_key,$val,$this->html);
     }
     return true;
   } #end of replaceValues() function
@@ -152,7 +158,7 @@ class transfiguration {
     } else return false; #if $dom is not array
   } #end of addDom() function
 
-
+  #Minify function to minify html
   public function minify() {
     $search = [
         '/\>[^\S ]+/s',
@@ -168,7 +174,7 @@ class transfiguration {
     ];
     $this->html = preg_replace($search, $replace, $this->html);
     return true;
-  }
+  } #end of minify() function
 
   #function to export html
   public function exportHtml() {
