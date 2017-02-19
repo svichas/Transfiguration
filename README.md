@@ -1,5 +1,5 @@
 # transfiguration
-**A php library to transfiguration live html**
+**A lightweight php library to transfigure html**
 
 ##Create transfiguration object and load HTML
 
