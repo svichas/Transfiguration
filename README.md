@@ -107,5 +107,3 @@ result:
 ```php
 print $transfiguration->exportHtml();
 ```
-
-
