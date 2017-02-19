@@ -102,7 +102,7 @@ result:
 </html>
 ```
 
-##Exporting code
+##Exporting HTML
 
 ```php
 print $transfiguration->exportHtml();
