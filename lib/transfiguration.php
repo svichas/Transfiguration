@@ -153,6 +153,23 @@ class transfiguration {
   } #end of addDom() function
 
 
+  public function minify() {
+    $search = [
+        '/\>[^\S ]+/s',
+        '/[^\S ]+\</s',
+        '/(\s)+/s',
+        '/<!--(.|\s)*?-->/'
+    ];
+    $replace = [
+        '>',
+        '<',
+        '\\1',
+        ''
+    ];
+    $this->html = preg_replace($search, $replace, $this->html);
+    return true;
+  }
+
   #function to export html
   public function exportHtml() {
     return $this->html;

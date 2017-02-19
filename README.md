@@ -107,3 +107,9 @@ result:
 ```php
 print $transfiguration->exportHtml();
 ```
+
+##Minify HTML
+
+```php
+print $transfiguration->minify();
+```

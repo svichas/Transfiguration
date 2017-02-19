@@ -46,5 +46,8 @@ $values = array(
 #creating code blocks
 $transfiguration->block("links",$values);
 
+#minify HTML
+$transfiguration->minify();
+
 #print transfigured html
 print $transfiguration->exportHtml();
