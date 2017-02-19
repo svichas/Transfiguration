@@ -150,7 +150,7 @@ class transfiguration {
       }
 
     } else return false; #if $dom is not array
-  } #end of domAdd() function
+  } #end of addDom() function
 
 
   #function to export html
