@@ -121,7 +121,7 @@ class transfiguration {
   ];
 
   */
-  public function addDom($dom = [],$append = true) {
+  public function addElement($dom = [],$append = true) {
     #checking if $dom is array
     if (is_array($dom)) {
       $step = 0;

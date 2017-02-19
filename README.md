@@ -82,7 +82,7 @@ $elements = array(
     "html" => "<i>This was added Later</i>",
   ]
 );
-$transfiguration->addDom($elements);
+$transfiguration->addElement($elements);
 ```
 
 ```html
