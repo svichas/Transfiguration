@@ -5,7 +5,7 @@
 
 ```php
 <?php
-require '../lib/transfiguration.php';
+require 'lib/transfiguration.php';
 #creating transfiguration object
 $transfiguration = new transfiguration();
 
