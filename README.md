@@ -10,7 +10,7 @@ require 'lib/transfiguration.php';
 $transfiguration = new transfiguration();
 
 #load html
-$transfiguration->loadHtml(file_get_contents("template.html"));
+$transfiguration->loadHtml(file_get_contents("template.html")); #or $transfiguration = new transfiguration(file_get_contents("template.html"));
 ```
 
 ##Replace text with data
