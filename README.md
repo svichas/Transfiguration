@@ -118,7 +118,7 @@ $transfiguration->minify();
 
 ```php
 $show = true;
-$transfiguration->isBlock("pageArea", $show);
+$transfiguration->ifBlock("pageArea", $show);
 ```
 ```html
   {%pageArea%}
@@ -130,7 +130,7 @@ $transfiguration->isBlock("pageArea", $show);
 ```
 ```php
 $show = false;
-$transfiguration->isBlock("pageArea", $show);
+$transfiguration->ifBlock("pageArea", $show);
 ```
 ```html
   {%pageArea%}
