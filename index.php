@@ -46,6 +46,12 @@ $values = array(
 #creating code blocks
 $transfiguration->block("links",$values);
 
+
+#creating if block
+$transfiguration->ifblock("post",false);
+$transfiguration->ifblock("page",true);
+
+
 #minify HTML
 $transfiguration->minify();
 

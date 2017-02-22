@@ -111,5 +111,32 @@ print $transfiguration->exportHtml();
 ##Minify HTML
 
 ```php
-print $transfiguration->minify();
+$transfiguration->minify();
+```
+
+##If block
+
+```php
+$show = true;
+$transfiguration->isBlock("pageArea", $show);
+```
+```html
+  {%pageArea%}
+    <p>This is post area</p>
+  {%endblock%}
+
+  result:
+  <p>This is post area</p>
+```
+```php
+$show = false;
+$transfiguration->isBlock("pageArea", $show);
+```
+```html
+  {%pageArea%}
+    <p>This is post area</p>
+  {%endblock%}
+
+  result:
+
 ```

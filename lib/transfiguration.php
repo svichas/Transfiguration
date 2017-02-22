@@ -158,6 +158,23 @@ class transfiguration {
     } else return false; #if $dom is not array
   } #end of addDom() function
 
+
+  public function ifBlock($blockName = "", $show=false, $caseSensitive = false) {
+
+    #append and preppend braces tp $blockName if required
+    $startBlock = "{%$blockName%}";
+    $endBlock = "{%endblock%}";
+
+    while (($caseSensitive) ? (strpos($this->html, $startBlock) > 0 && strpos($this->html, $endBlock) > 0) : (stripos($this->html, $startBlock) > 0 && stripos($this->html, $endBlock) > 0)) {
+      $innerHtml = $this->gethtmlbetween($startBlock,$endBlock);
+      $full = $startBlock.$innerHtml.$endBlock;
+      $string = ($show) ? $innerHtml : "";
+      $this->html = substr_replace($this->html, $string, stripos($this->html, $startBlock),strlen($full));
+    }
+
+    return true;
+  } #end of ifBlock() function
+
   #Minify function to minify html
   public function minify() {
     $search = [
