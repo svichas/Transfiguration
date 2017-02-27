@@ -38,16 +38,14 @@ Hello my name is steve, and I'm 19 years old!
 ```php
 #creating block code
 $values = array(
-  array(
-    [
-      "link" => "https://github.com/svichas/transfiguration",
-      "text" => "GitHub"
-    ],
-    [
-      "link" => "http://facebook.com/",
-      "text" => "Facebook"
-    ]
-  ),
+  [
+    "link" => "https://github.com/svichas/transfiguration",
+    "text" => "GitHub"
+  ],
+  [
+    "link" => "http://facebook.com/",
+    "text" => "Facebook"
+  ]
 );
 #creating code blocks
 $transfiguration->block("links",$values);
