@@ -16,19 +16,23 @@ $transfiguration->replaceValues($values);
 
 #adding html elements
 $elements = array(
-  "head" => [
-    "tagname" => "link",
-    "rel" => "stylesheet",
-    "href" => "link/to/css"
-  ],
-  "body" => [
-    "tagname" => "p",
-    "style" => "font-weight:bold;",
-    "html" => "<i>This was added Later</i>",
-  ]
+  "appendto" => "head",
+  "tagname" => "link",
+  "rel" => "stylesheet",
+  "href" => "link/to/css"
 );
 $transfiguration->addElement($elements);
 
+$element = array(
+  "appendto" => "body",
+  "tagname" => "p",
+  "class" => "paragraph",
+  "html" => "This was added <b>later</b>"
+);
+$transfiguration->addElement($element);
+
+
+#creating code blocks
 $values = array(
   [
     "link" => "https://github.com/svichas/transfiguration",
@@ -43,9 +47,7 @@ $values = array(
     "text" => "Youtube"
   ]
 );
-#creating code blocks
 $transfiguration->block("links",$values);
-
 
 #creating if block
 $transfiguration->ifblock("post",false);

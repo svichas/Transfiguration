@@ -13,6 +13,12 @@ $transfiguration = new transfiguration();
 $transfiguration->loadHtml(file_get_contents("template.html")); #or $transfiguration = new transfiguration(file_get_contents("template.html"));
 ```
 
+##Exporting HTML
+
+```php
+print $transfiguration->exportHtml();
+```
+
 ##Replace text with data
 
 ```php
@@ -67,20 +73,23 @@ Result:
 ##Adding elements
 
 ```php
-#adding html elements
+#adding elements
 $elements = array(
-  "head" => [
-    "tagname" => "link",
-    "rel" => "stylesheet",
-    "href" => "link/to/css"
-  ],
-  "body" => [
-    "tagname" => "p",
-    "style" => "font-weight:bold;",
-    "html" => "<i>This was added Later</i>",
-  ]
+  "appendto" => "head",
+  "tagname" => "link",
+  "rel" => "stylesheet",
+  "href" => "link/to/css"
 );
 $transfiguration->addElement($elements);
+
+$element = array(
+  "appendto" => "body",
+  "tagname" => "p",
+  "class" => "paragraph",
+  "style" => "padding:5px;",
+  "html" => "This was added <b>later</b>"
+);
+$transfiguration->addElement($element);
 ```
 
 ```html
@@ -95,15 +104,9 @@ result:
 <html>
 <head><link rel="stylesheet" href="link/to/css"><head>
 <body>
-  <p style="font-weight:bold;"><i>This was added Later</i></p>
+  <p style="font-weight:bold;" class="paragraph">This was added <b>Later</b></p>
 </body>
 </html>
-```
-
-##Exporting HTML
-
-```php
-print $transfiguration->exportHtml();
 ```
 
 ##Minify HTML

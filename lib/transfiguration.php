@@ -1,6 +1,8 @@
 <?php
 /*
 
+https://github.com/svichas/Transfiguration
+
 MIT License
 
 Copyright (c) 2017 stefanos vichas
@@ -28,7 +30,7 @@ SOFTWARE.
 class transfiguration {
 
   #var for html
-  protected $html = "";
+  private $html = "";
 
 
   function __construct($arg = "") {
@@ -127,33 +129,39 @@ class transfiguration {
   ];
 
   */
-  public function addElement($dom = [],$append = true) {
+  public function addElement($element = []) {
     #checking if $dom is array
-    if (is_array($dom)) {
-      $step = 0;
-      $dom_keys = array_keys($dom);
-      foreach ($dom as $node) {
-        $to = strtolower($dom_keys[$step]);
-        $to = ($append) ? "</".$to.">" : "<".$to.">";
+    if (is_array($element)) {
 
-        if (stripos($this->html,$to) > 0) {
+      $element_keys = array_keys($element);
+      $data = [
+        "attrs" => "",
+        "append" => "body",
+        "tag" => "",
+        "html" => "",
+        "value" => "",
+      ];
 
-          $html = "";
-          $attr = "";
-
-          foreach (array_keys($node) as $key) {
-            if (!in_array($key,["tagname","html","value"])) $attr .= $key."=\"".$node[$key]."\" ";
-            else if (in_array(strtolower($key),["html","value"])) $html = $node[$key];
-          }
-          $attr = rtrim($attr," ");
-          $tagname = $node["tagname"];
-
-          $str = "<$tagname $attr>";
-          if (!in_array(strtolower($tagname), ["link"])) $str = $str . $html . "</$tagname>";
-          $this->html = str_ireplace($to, ($append) ? $str.$to : $to.$str, $this->html);
+      foreach ($element_keys as $element_key) {
+        $element_key = strtolower($element_key);
+        if ($element_key == "appendto" || $element_key == "append") {
+          $data["append"] = $element[$element_key];
+        } else if ($element_key == "html") {
+          $data["html"] = $element[$element_key];
+        } else if ($element_key == "value") {
+          $data["value"] = htmlspecialchars($element[$element_key],ENT_QUOTES, "UTF-8");
+        } else if ($element_key == "tagname" || $element_key == "tag") {
+          $data["tag"] = $element[$element_key];
+        } else {
+          $data["attrs"] .= " ".$element_key."='".$element[$element_key]."'";
         }
-        $step += 1;
       }
+
+      $element = (strtolower($data['tag'])=="link") ? "<{$data['tag']}{$data['attrs']}>" : "<{$data['tag']}{$data['attrs']}>{$data['html']}{$data['value']}</{$data['tag']}>";
+      $replaceOn = "</{$data["append"]}>";
+      $replaceWith = $element.$replaceOn;
+
+      $this->html = str_ireplace($replaceOn, $replaceWith, $this->html);
 
     } else return false; #if $dom is not array
   } #end of addDom() function
