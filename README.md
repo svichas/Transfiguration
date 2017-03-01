@@ -1,5 +1,5 @@
 # transfiguration
-**A lightweight php library to transfigure html**
+**A lightweight template library in php to transfigure HTML**
 
 ##Create transfiguration object and load HTML
 
