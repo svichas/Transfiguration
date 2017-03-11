@@ -52,6 +52,20 @@ class transfiguration {
   } #end of gethtmlbetween() function
 
 
+  private function constructElement($tagname, $attributes, $html, $value) {
+    $element = (strtolower($tagname)=="link") ? "<{$tagname}{$attributes}>" : "<{$tagname}{$attributes}>{$html}{$value}</{$tagname}>";
+    return $element;
+  } #end of constructElement() function
+
+
+
+  private function appendElement($element, $appendto) {
+    $appendto = "</$appendto>";
+    $element = $element.$appendto;
+    $this->html = str_ireplace($appendto, $element, $this->html);
+  } #end of appendElement() function
+
+
   #function to replace blocks with data
   public function block($blockName, $values, $withbraces=true, $caseSensitive=false, $xss = false) {
 
@@ -105,18 +119,6 @@ class transfiguration {
     }
     return true;
   } #end of replaceValues() function
-
-
-  private function constructElement($tagname, $attributes, $html, $value) {
-    $element = (strtolower($tagname)=="link") ? "<{$tagname}{$attributes}>" : "<{$tagname}{$attributes}>{$html}{$value}</{$tagname}>";
-    return $element;
-  } #end of constructElement() function
-
-  private function appendElement($element, $appendto) {
-    $appendto = "</$appendto>";
-    $element = $element.$appendto;
-    $this->html = str_ireplace($appendto, $element, $this->html);
-  } #end of appendElement() function
 
 
   #domAdd() function for adding dom elements
