@@ -104,7 +104,7 @@ result:
 <html>
 <head><link rel="stylesheet" href="link/to/css"><head>
 <body>
-  <p style="font-weight:bold;" class="paragraph">This was added <b>Later</b></p>
+  <p style="padding:5px;" class="paragraph">This was added <b>Later</b></p>
 </body>
 </html>
 ```
@@ -124,7 +124,7 @@ $transfiguration->ifBlock("pageArea", $show);
 ```html
   {%pageArea%}
     <p>This is post area</p>
-  {%endblock%}
+  {%/pageArea%}
 
   result:
   <p>This is post area</p>
@@ -136,7 +136,7 @@ $transfiguration->ifBlock("pageArea", $show);
 ```html
   {%pageArea%}
     <p>This is post area</p>
-  {%endblock%}
+  {%/pageArea%}
 
   result:
 

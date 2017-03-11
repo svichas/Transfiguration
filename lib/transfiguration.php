@@ -107,28 +107,19 @@ class transfiguration {
   } #end of replaceValues() function
 
 
-  #domAdd() function for adding dom elements
-  #$dom array var for elements to add
-  # $dom systax
-  /*
-  $dom = [
-    "append_tag_name" => [
-      "tagname" => "tagname of the element", #this array index is required
-      "value" => "value of the element",
-      "class" => "class of the element",
-      "attr" => ""
-      ...
-    ],
-    #for example.
-    "head" => [
-      "tagname" => "link",
-      "href" => "link/to/css",
-      "rel" => "stylesheet"
-    ],
-    ...
-  ];
+  private function constructElement($tagname, $attributes, $html, $value) {
+    $element = (strtolower($tagname)=="link") ? "<{$tagname}{$attributes}>" : "<{$tagname}{$attributes}>{$html}{$value}</{$tagname}>";
+    return $element;
+  } #end of constructElement() function
 
-  */
+  private function appendElement($element, $appendto) {
+    $appendto = "</$appendto>";
+    $element = $element.$appendto;
+    $this->html = str_ireplace($appendto, $element, $this->html);
+  } #end of appendElement() function
+
+
+  #domAdd() function for adding dom elements
   public function addElement($element = []) {
     #checking if $dom is array
     if (is_array($element)) {
@@ -157,11 +148,9 @@ class transfiguration {
         }
       }
 
-      $element = (strtolower($data['tag'])=="link") ? "<{$data['tag']}{$data['attrs']}>" : "<{$data['tag']}{$data['attrs']}>{$data['html']}{$data['value']}</{$data['tag']}>";
-      $replaceOn = "</{$data["append"]}>";
-      $replaceWith = $element.$replaceOn;
+      $element = $this->constructElement($data['tag'], $data["attrs"], $data["html"], $data["value"]);
 
-      $this->html = str_ireplace($replaceOn, $replaceWith, $this->html);
+      $this->appendElement($element, $data['append']);
 
     } else return false; #if $dom is not array
   } #end of addDom() function
@@ -171,7 +160,7 @@ class transfiguration {
 
     #append and preppend braces tp $blockName if required
     $startBlock = "{%$blockName%}";
-    $endBlock = "{%endblock%}";
+    $endBlock = "{%/$blockName%}";
 
     while (($caseSensitive) ? (strpos($this->html, $startBlock) > 0 && strpos($this->html, $endBlock) > 0) : (stripos($this->html, $startBlock) > 0 && stripos($this->html, $endBlock) > 0)) {
       $innerHtml = $this->gethtmlbetween($startBlock,$endBlock);

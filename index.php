@@ -55,7 +55,7 @@ $transfiguration->ifblock("page",true);
 
 
 #minify HTML
-$transfiguration->minify();
+//$transfiguration->minify();
 
 #print transfigured html
 print $transfiguration->exportHtml();
