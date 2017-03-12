@@ -141,3 +141,16 @@ $transfiguration->ifBlock("pageArea", $show);
   result:
 
 ```
+
+##get variables from html
+
+```php
+$varname_value = $transfiguration->getValue("varname");
+```
+
+###Setting variables throw html
+```html
+{# varname = var value #}
+
+{#test=testvalue#}
+```

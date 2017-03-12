@@ -53,6 +53,14 @@ $transfiguration->block("links",$values);
 $transfiguration->ifblock("post",false);
 $transfiguration->ifblock("page",true);
 
+#Get values
+print $transfiguration->getValue("var1");
+print "<br>";
+print $transfiguration->getValue("name");
+print "<br>";
+print $transfiguration->getValue("theme_name");
+
+
 
 #minify HTML
 //$transfiguration->minify();

@@ -31,6 +31,7 @@ class transfiguration {
 
   #var for html
   private $html = "";
+  private $vars = [];
 
 
   function __construct($arg = "") {
@@ -56,7 +57,6 @@ class transfiguration {
     $element = (strtolower($tagname)=="link") ? "<{$tagname}{$attributes}>" : "<{$tagname}{$attributes}>{$html}{$value}</{$tagname}>";
     return $element;
   } #end of constructElement() function
-
 
 
   private function appendElement($element, $appendto) {
@@ -105,6 +105,28 @@ class transfiguration {
 
     return true;
   } #end of block() function
+
+
+  public function getValue($name = "") {
+    $count = 1;
+    while (stripos($this->html, "{#") > 0 && stripos($this->html, "#}") > 0 && $count <= 200) {
+
+      $content = $this->gethtmlbetween("{#","#}");
+      $full_content = "{#".$content."#}";
+      $this->html = str_ireplace($full_content, "", $this->html);
+
+      $var_name = trim(substr($content, 0, stripos($content, "=")), " ");
+      $var_value = trim(substr($content, stripos($content, "=")+1,-1), " ");
+
+      $this->vars[$var_name] = $var_value;
+
+      $count += 1;
+
+    }
+
+    return (isset($this->vars[$name])) ? $this->vars[$name] : "";
+
+  }
 
 
   #function to replace values from the html with data
