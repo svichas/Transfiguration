@@ -1,7 +1,7 @@
 # transfiguration
 **A lightweight template engine library in php to transfigure HTML**
 
-##Create transfiguration object and load HTML
+## Create transfiguration object and load HTML
 
 ```php
 <?php
@@ -13,13 +13,13 @@ $transfiguration = new transfiguration();
 $transfiguration->loadHtml(file_get_contents("template.html")); #or $transfiguration = new transfiguration(file_get_contents("template.html"));
 ```
 
-##Exporting HTML
+## Exporting HTML
 
 ```php
 print $transfiguration->exportHtml();
 ```
 
-##Replace text with data
+## Replace text with data
 
 ```php
 #replacing values with data
@@ -39,7 +39,7 @@ Hello my name is steve, and I'm 19 years old!
 ```
 
 
-##Block code
+## Block code
 
 ```php
 #creating block code
@@ -70,7 +70,7 @@ Result:
 </ul>
 ```
 
-##Adding elements
+## Adding elements
 
 ```php
 #adding elements
@@ -109,13 +109,13 @@ result:
 </html>
 ```
 
-##Minify HTML
+## Minify HTML
 
 ```php
 $transfiguration->minify();
 ```
 
-##If block
+## If block
 
 ```php
 $show = true;
@@ -142,13 +142,13 @@ $transfiguration->ifBlock("pageArea", $show);
 
 ```
 
-##get variables from html
+## get variables from html
 
 ```php
 $varname_value = $transfiguration->getValue("varname");
 ```
 
-###Setting variables in html
+### Setting variables in html
 ```html
 {# varname = var value #}
 
