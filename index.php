@@ -61,7 +61,6 @@ print "<br>";
 print $transfiguration->getValue("theme_name");
 
 
-
 #minify HTML
 //$transfiguration->minify();
 

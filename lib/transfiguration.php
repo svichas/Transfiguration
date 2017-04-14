@@ -33,7 +33,6 @@ class transfiguration {
   private $html = "";
   private $vars = [];
 
-
   function __construct($arg = "") {
     if (isset($arg)&&$arg!="") $this->html = $arg;
   } #end of __construct() function
@@ -53,8 +52,16 @@ class transfiguration {
   } #end of gethtmlbetween() function
 
 
-  private function constructElement($tagname, $attributes, $html, $value) {
-    $element = (strtolower($tagname)=="link") ? "<{$tagname}{$attributes}>" : "<{$tagname}{$attributes}>{$html}{$value}</{$tagname}>";
+  private function constructElement($tagname="", $attributes="", $html="", $value = "") {
+	  
+    if (strtolower($tagname)=="link") {
+      $element = "<{$tagname}{$attributes} />";
+    } else if (strtolower($tagname)=="meta") {
+      $element = "<{$tagname}{$attributes} />";
+    } else {
+      $element = "<{$tagname}{$attributes}>{$html}{$value}</{$tagname}>";
+    }
+	
     return $element;
   } #end of constructElement() function
 
@@ -148,14 +155,15 @@ class transfiguration {
     #checking if $dom is array
     if (is_array($element)) {
 
-      $element_keys = array_keys($element);
+
       $data = [
-        "attrs" => "",
-        "append" => "body",
+        "append" => "",
         "tag" => "",
         "html" => "",
         "value" => "",
+        "attrs" => ""
       ];
+      $element_keys = array_keys($element);
 
       foreach ($element_keys as $element_key) {
         $element_key = strtolower($element_key);
@@ -173,7 +181,6 @@ class transfiguration {
       }
 
       $element = $this->constructElement($data['tag'], $data["attrs"], $data["html"], $data["value"]);
-
       $this->appendElement($element, $data['append']);
 
     } else return false; #if $dom is not array
@@ -219,11 +226,14 @@ class transfiguration {
     return $this->html;
   } #end of exportHtml() function
 
+  #function to save html
+  public function saveHtml() {
+    return $this->html;
+  } #end of saveHtml() function
 
   #function to load html
   public function loadHtml($html = "") {
     $this->html = $html;
   } #end of loadHtml() function
-
 
 }
