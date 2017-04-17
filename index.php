@@ -50,8 +50,8 @@ $values = array(
 $transfiguration->block("links",$values);
 
 #creating if block
-$transfiguration->ifblock("post",false);
-$transfiguration->ifblock("page",true);
+$transfiguration->showBlock("post",false);
+$transfiguration->showBlock("page",true);
 
 #Get values
 print $transfiguration->getValue("var1");

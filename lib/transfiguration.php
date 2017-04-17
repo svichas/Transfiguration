@@ -53,14 +53,28 @@ class transfiguration {
 
 
   private function constructElement($tagname="", $attributes="", $html="", $value = "") {
+
+    $close = true;
 	  
-    if (strtolower($tagname)=="link") {
-      $element = "<{$tagname}{$attributes} />";
-    } else if (strtolower($tagname)=="meta") {
-      $element = "<{$tagname}{$attributes} />";
-    } else {
-      $element = "<{$tagname}{$attributes}>{$html}{$value}</{$tagname}>";
-    }
+    $not_closing_tags = [
+      "link",
+      "meta",
+      "input",
+      "hr",
+      "br",
+      "source",
+      "param",
+      "img",
+      "embed",
+      "command",
+      "col",
+      "base",
+      "area",
+    ];
+
+    if (in_array(strtolower($tagname), $not_closing_tags)) $close = false;
+
+    $element = ($close) ? "<{$tagname}{$attributes}>{$html}{$value}</{$tagname}>" : "<{$tagname}{$attributes} />";
 	
     return $element;
   } #end of constructElement() function
@@ -187,7 +201,7 @@ class transfiguration {
   } #end of addDom() function
 
 
-  public function ifBlock($blockName = "", $show=false, $caseSensitive = false) {
+  public function showBlock($blockName = "", $show=false, $caseSensitive = false) {
 
     #append and preppend braces tp $blockName if required
     $startBlock = "{%$blockName%}";
@@ -201,7 +215,7 @@ class transfiguration {
     }
 
     return true;
-  } #end of ifBlock() function
+  } #end of showBlock() function
 
   #Minify function to minify html
   public function minify() {
