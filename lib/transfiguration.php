@@ -55,6 +55,7 @@ class transfiguration {
   private function constructElement($tagname="", $attributes="", $html="", $value = "") {
 
     $close = true;
+    $value = htmlspecialchars($value);
 	  
     $not_closing_tags = [
       "link",
@@ -186,7 +187,7 @@ class transfiguration {
         } else if ($element_key == "html") {
           $data["html"] = $element[$element_key];
         } else if ($element_key == "value") {
-          $data["value"] = htmlspecialchars($element[$element_key],ENT_QUOTES, "UTF-8");
+          $data["value"] = $element[$element_key];
         } else if ($element_key == "tagname" || $element_key == "tag") {
           $data["tag"] = $element[$element_key];
         } else {
