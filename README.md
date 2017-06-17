@@ -19,6 +19,11 @@ $transfiguration->loadHtml(file_get_contents("template.html")); #or $transfigura
 print $transfiguration->exportHtml();
 ```
 
+## Rendering HTML
+```php
+$transfiguration->renderHtml();
+```
+
 ## Replace text with data
 
 ```php
