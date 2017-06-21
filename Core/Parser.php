@@ -10,11 +10,13 @@ class Parser {
 		"WHILE" => "ENDWHILE",
 		"IF" => "ENDIF"
 	];
+	public $base_include_path = "";
 
-	function __construct($tokens = [], $data=[]) {
+	function __construct($tokens = [], $data=[], $path="") {
 		$this->toks = $tokens;
 		$this->tokens = $tokens;
 		$this->Evaluator = new Evaluator($data);
+		$this->base_include_path = $path;
 
 		$this->ParseTokens();
 	}
@@ -30,6 +32,23 @@ class Parser {
 			//print_r($token);
 
 			switch (strtoupper($token['type'])) {
+
+
+				case 'INCLUDE':
+
+					$require_path = $this->Evaluator->evaluate($token['content'], $token_data);
+					$require_path = $this->base_include_path.  $require_path;
+					if (file_exists($require_path)) {
+						
+						$transifug = new Transfiguration(file_get_contents($require_path), $this->Evaluator->data);
+						$inc_tokens = $transifug->parser->exportTokens();
+						$this->appendTokens($i,$inc_tokens);
+
+					}
+
+					//print $require_path;
+
+					break;
 				case 'ECHO':
 
 					$this->setToken($i, $this->Evaluator->evaluate($token["content"],$token_data));

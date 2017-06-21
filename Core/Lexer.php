@@ -38,8 +38,10 @@ Class Lexer {
 		    }
 
 		    if ($openCodeBlock && $char == "}" && $nextchar == "}") {	
+		    	
 		    	$codeType    = $this->findCodeType($codeBlock);
 		    	$codeContent = $this->findCodeContent($codeBlock);
+
 		    	$this->createToken($codeType, $codeContent);
 		    	$codeBlock   = "";
 		    	$openCodeBlock = false;
@@ -69,6 +71,7 @@ Class Lexer {
 
 		$type = strtoupper($type);
 		$ctab = $this->tab;
+
 
 		if ($type == "IF") {
 			$this->tab++;

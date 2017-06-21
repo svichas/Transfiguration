@@ -1,5 +1,17 @@
-{{for $test in $key : $tests}}
-	{{print $test}}
-{{endfor}}
 
 
+{{var $k = [1,2,3,4,5,6]}}
+
+
+{{include "test.php"}}
+
+
+
+
+{{var $username = "awesome"}}
+
+{{if $username == "test"}}
+test
+{{elseif $username == "awesome"}}
+	{{echo $username . " is awesome!!" }}
+{{endif}}
