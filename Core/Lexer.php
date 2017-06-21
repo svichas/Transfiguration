@@ -25,7 +25,7 @@ Class Lexer {
 		    $char = substr( $this->html, $i, 1);
 		    $nextchar = ($strlen >= $i) ? substr( $this->html, $i+1, 1) : "";
 
-		    if (!$openCodeBlock && $char == "{" && $nextchar = "{") {
+		    if (!$openCodeBlock && $char == "{" && $nextchar == "{") {
 
 		    	if ($htmlBlock != "") {
 
