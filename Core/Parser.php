@@ -112,13 +112,6 @@ class Parser {
 
 					break;
 
-				case "WHILE":
-
-					$while_tokens = $this->findEnd($token, $i);
-					$return_loop_tokens  = $this->Evaluator->doWhileLoop($while_tokens, $token['content'], $this->Evaluator);
-					$this->appendTokens($i, $return_loop_tokens);
-
-					break;
 
 				case "IF":
 

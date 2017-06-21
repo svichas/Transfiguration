@@ -38,18 +38,6 @@ class Evaluator {
 	}
 
 
-	public function doWhileLoop($loop_tokens=[], $loop_condision="", $evaluator) {
-		$return_loop_tokens = [];
-		$step = 0;
-		while ($this->evaluate($loop_condision)&&$step<100000) {
-
-			$step++;
-
-		}
-
-		return $return_loop_tokens;
-	}
-
 	public function doFor($for_tokens = [], $for_array = "", $for_var = "", $for_key="") {
 
 		$for_array = $this->evalVar($for_array, true);
