@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 class Parser {
 
@@ -29,17 +29,17 @@ class Parser {
 
 			$token = $this->tokens[$i];
 			$token_data = isset($token['data']) ? $token['data'] : [];
-			//print_r($token);
 
 			switch (strtoupper($token['type'])) {
 
 
-				case 'INCLUDE':
+				case
+				 'INCLUDE':
 
 					$require_path = $this->Evaluator->evaluate($token['content'], $token_data);
 					$require_path = $this->base_include_path.  $require_path;
 					if (file_exists($require_path)) {
-						
+
 						$transifug = new Transfiguration(file_get_contents($require_path), $this->Evaluator->data);
 						$inc_tokens = $transifug->parser->exportTokens();
 						$this->appendTokens($i,$inc_tokens);
@@ -105,18 +105,18 @@ class Parser {
 
 					$return_fors = $this->Evaluator->doFor($for_tokens, $for_var_array, $for_var, $key);
 					$this->appendTokens($i, $return_fors);
-					
+
 					//recompile
 					$i = 0;
-					
+
 
 					break;
 
 				case "WHILE":
 
 					$while_tokens = $this->findEnd($token, $i);
-
-
+					$return_loop_tokens  = $this->Evaluator->doWhileLoop($while_tokens, $token['content'], $this->Evaluator);
+					$this->appendTokens($i, $return_loop_tokens);
 
 					break;
 
@@ -135,7 +135,7 @@ class Parser {
 
 							switch (strtoupper($if_token['type'])) {
 								case 'IF':
-									
+
 									if ($this->Evaluator->evaluate($if_token['content'], $token_data)) {
 										$executable_position = $step;
 										$found_executable = true;
@@ -158,11 +158,11 @@ class Parser {
 								case "ENDIF":
 									$found_endif = true;
 									break;
-								
+
 							}
 
 						}
-						
+
 						$step++;
 					}
 
@@ -183,7 +183,7 @@ class Parser {
 								case 'IF':
 
 									if ($show) $show = false;
-									
+
 									if ($executable_position == $step) $show = true;
 
 									$this->removeToken($step);
@@ -195,12 +195,12 @@ class Parser {
 									if ($show) $show = false;
 
 									if ($executable_position == $step) $show = true;
-									
+
 									$this->removeToken($step);
 
 									break;
 								case "ELSE":
-									
+
 									if ($show) $show = false;
 
 									if ($executable_position == $step) $show = true;
@@ -213,7 +213,7 @@ class Parser {
 									if ($show) $show = false;
 
 									$found_endif = true;
-									
+
 									$this->removeToken($step);
 
 									break;
@@ -230,9 +230,9 @@ class Parser {
 					}
 
 
-					
+
 					break;
-				
+
 				default:
 					# code...
 					break;
@@ -254,9 +254,7 @@ class Parser {
 		$loop_tokens   = [];
 		$step          = $position;
 
-
-		while (!$found_end && $step < 100000) {
-
+		while (!$found_end && isset($this->tokens[$step]) && $step < 100000) {
 
 			$loop_token = $this->tokens[$step];
 
@@ -270,7 +268,7 @@ class Parser {
 			$this->removeToken($step);
 			$step++;
 		}
-	
+
 
 		return $loop_tokens;
 	}
@@ -307,5 +305,5 @@ class Parser {
 	function exportTokens() {
 		return $this->tokens;
 	}
-	
+
 }

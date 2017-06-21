@@ -19,7 +19,7 @@ class Evaluator {
 			extract($data);
 
 			@eval("\$__result__ = ".$expression.";");
-			
+
 			return $__result__;
 		} catch (Exception $e) {
 			die($e);
@@ -38,25 +38,16 @@ class Evaluator {
 	}
 
 
-	public function doWhileLoop($loop_tokens=[], $loop_condision="") {
+	public function doWhileLoop($loop_tokens=[], $loop_condision="", $evaluator) {
 		$return_loop_tokens = [];
 		$step = 0;
-		while ($this->evaluate($loop_condision)) {
-			$token = $loop_tokens[$step];
-			switch (strtoupper($token)) {
-				case "PRINT":
+		while ($this->evaluate($loop_condision)&&$step<100000) {
 
-					break;
-				case "ECHO":
-
-					break;
-
-				case "VAR":
-
-					break;
-			}
 			$step++;
+
 		}
+
+		return $return_loop_tokens;
 	}
 
 	public function doFor($for_tokens = [], $for_array = "", $for_var = "", $for_key="") {
@@ -68,7 +59,7 @@ class Evaluator {
 		$return_fortokens = [];
 
 		foreach ($this->data[$for_array] as $__key__ => $__var__) {
-			
+
 			for ($i=0;$i<count($for_tokens);$i++) {
 				if ($for_key != "") {
 					$for_tokens[$i]['data'] = [
@@ -85,11 +76,11 @@ class Evaluator {
 			foreach ($for_tokens as $tok) {
 				$return_fortokens[] = $tok;
 			}
-		
+
 		}
 
 		return $return_fortokens;
-	
+
 	}
 
 }
