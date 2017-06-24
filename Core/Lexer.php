@@ -1,5 +1,7 @@
 <?php 
 
+namespace Transfiguration\Core;
+
 Class Lexer {
 
 	public $html   = "";

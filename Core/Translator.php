@@ -1,4 +1,5 @@
 <?php
+namespace Transfiguration\Core;
 
 class Translator {
 

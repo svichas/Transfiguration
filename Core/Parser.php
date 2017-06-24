@@ -1,4 +1,9 @@
 <?php
+namespace Transfiguration\Core;
+
+use Transfiguration\Helpers\Evaluator;
+
+
 
 class Parser {
 

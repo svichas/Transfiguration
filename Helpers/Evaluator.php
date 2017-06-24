@@ -1,4 +1,5 @@
 <?php
+namespace Transfiguration\Helpers;
 
 class Evaluator {
 
