@@ -40,18 +40,17 @@ class Parser {
 
 				case
 				 'INCLUDE':
-
+				 
 					$require_path = $this->Evaluator->evaluate($token['content'], $token_data);
 					$require_path = $this->base_include_path.  $require_path;
+
 					if (file_exists($require_path)) {
-
-						$transifug = new Transfiguration(file_get_contents($require_path), $this->Evaluator->data);
-						$inc_tokens = $transifug->parser->exportTokens();
+						$content = file_get_contents($require_path);
+						$transfig = new \Transfiguration($content, $this->Evaluator->data);
+						$inc_tokens = $transfig->parser->exportTokens();
 						$this->appendTokens($i,$inc_tokens);
-
 					}
 
-					//print $require_path;
 
 					break;
 				case 'ECHO':
