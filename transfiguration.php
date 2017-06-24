@@ -11,5 +11,4 @@ require 'Core/Translator.php';
 /*
 Require Helpers.
 */
-require 'Helpers/Compiler.php';
 require 'Helpers/Evaluator.php';

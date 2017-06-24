@@ -15,6 +15,7 @@ Class Lexer {
 	private function createTokens() {
 
 		$openCodeBlock = false;
+		$skipNext = false;
 
 		$strlen = strlen($this->html);
 		$prevchar = "";
@@ -22,40 +23,34 @@ Class Lexer {
 		$htmlBlock = "";
 
 		for( $i = 0; $i <= $strlen; $i++ ) {
-		    $char = substr( $this->html, $i, 1);
-		    $nextchar = ($strlen >= $i) ? substr( $this->html, $i+1, 1) : "";
 
-		    if (!$openCodeBlock && $char == "{" && $nextchar == "{") {
+			$char = substr( $this->html, $i, 1);
+			$nextchar = ($strlen >= $i) ? substr( $this->html, $i+1, 1) : "";
 
-		    	if ($htmlBlock != "") {
+			if ($skipNext) {
+				$skipNext = false;
+				continue;
+			}
 
-		    		$this->createToken("html", $htmlBlock);
+			//Open code block
+			if (!$openCodeBlock && $char == "{" && $nextchar == "{") {
+				$skipNext = true;
+				$openCodeBlock = true;
+				$this->createToken("HTML", $htmlBlock);
+				$htmlBlock = "";
+			} else if ($openCodeBlock && $char == "}" && $nextchar == "}") {
+				$skipNext = true;
+				$openCodeBlock = false;
+				$this->doToken($codeBlock);
+				$codeBlock = "";
+			} else if (!$openCodeBlock) {
+				$htmlBlock .= $char;
+			} else if ($openCodeBlock) {
+				$codeBlock .= $char;
+			}
 
-		    		$htmlBlock = "";
-		    	}
 
-		    	$openCodeBlock = true;
-		    }
-
-		    if ($openCodeBlock && $char == "}" && $nextchar == "}") {	
-		    	
-		    	$codeType    = $this->findCodeType($codeBlock);
-		    	$codeContent = $this->findCodeContent($codeBlock);
-
-		    	$this->createToken($codeType, $codeContent);
-		    	$codeBlock   = "";
-		    	$openCodeBlock = false;
-		    }
-
-		    if ($openCodeBlock&&$char!="{"&&$char!="}") {
-		    	$codeBlock .= $char;
-		    }
-
-		    if (!$openCodeBlock && ($char != "}" && $nextchar != "}")) {
-		    	$htmlBlock .= $char;
-		    }
-
-		    $prevchar = $char; 
+			$prevchar = $char;
 		}
 
 		$this->createToken("html", $htmlBlock);
@@ -67,7 +62,7 @@ Class Lexer {
 		return $this->tokens;
 	}
 	
-	private function createToken($type, $content="") {
+	private function createToken($type="", $content="") {
 
 		$type = strtoupper($type);
 		$ctab = $this->tab;
@@ -114,6 +109,12 @@ Class Lexer {
 
 
 	
+	}
+
+	private function doToken($content="") {
+		$token_type = $this->findCodeType($content);
+		$token_content = $this->findCodeContent($content);
+		$this->createToken($token_type, $token_content);
 	}
 
 	private function findCodeType($codeBlock) {

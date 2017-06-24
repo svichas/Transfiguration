@@ -6,6 +6,7 @@ class Transfiguration {
 	public function __construct($html, $data = [], $path="") {
 		$lexer = new Lexer($html);
 		$this->parser = new Parser($lexer->exportTokens(), $data, $path);
+	
 	}
 
 	public function export() {
