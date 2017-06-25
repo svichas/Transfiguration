@@ -10,6 +10,7 @@ class Translator {
 	}
 
 	public function translate() {
+
 		$html = "";
 
 		foreach ($this->tokens as $token) {

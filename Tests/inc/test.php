@@ -1,3 +1,3 @@
-{{for $test in $key : $k}}
+{{for $test in $key : $tests}}
 	{{echo $key . " : " . $test}}
 {{endfor}}

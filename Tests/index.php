@@ -8,5 +8,7 @@ $data = [
 		"giorgos"
 	]
 ];
+
+
 $trans = new Transfiguration(file_get_contents("template.html"), $data, "inc/");
-$trans->export();
+$trans->render();
