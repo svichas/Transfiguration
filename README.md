@@ -1,11 +1,12 @@
 <div align="center">
 	<h1>
 	<span>Transfiguration</span>
-	<div style="font-size:12px;">A light-weight template engine</div>
+	<h5 >A light-weight template engine</h5>
 	</h1>
 </div>
 
 <h3>Installation</h3>
+
 ```php
 require 'Transfiguration/transfiguration.php';
 ```
