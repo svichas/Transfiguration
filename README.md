@@ -22,12 +22,14 @@ $transfiguration = new Transfiguration(file_get_contents("{template path}"), $da
 
 <h3>Rendering template</h3>
 <p>This function is printing template html into the page.</p>
+
 ```php
 $transfiguration->render();
 ```
 
 <h3>Exporting template</h3>
 <p>This function returns executed template html.</p>
+
 ```php
 $transfiguration->export();
 ```
