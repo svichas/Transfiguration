@@ -18,7 +18,11 @@ class Evaluator {
 
 			extract($this->data);
 			extract($data);
-
+			
+			//taking first part for security reasons
+			$expression_arr = explode(";" , $expression);
+			$expression = $expression_arr[0];
+	
 			@eval("\$__result__ = ".$expression.";");
 
 			return $__result__;
