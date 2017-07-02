@@ -74,3 +74,8 @@ $transfiguration->export();
 ```html
 {{ include 'base/footer.html' }}
 ```
+<p>or</p>
+
+```html
+{{ require 'base/footer.html' }}
+```
