@@ -35,23 +35,16 @@ class Parser {
 
 			switch (strtoupper($token['type'])) {
 
+				case 'INCLUDE':
 
-				case
-				 'INCLUDE':
-
-					$require_path = $this->Evaluator->evaluate($token['content'], $token_data);
-					$require_path = $this->base_include_path.  $require_path;
-
-					if (file_exists($require_path)) {
-						$content = file_get_contents($require_path);
-						$temp_data = array_merge($this->Evaluator->data, $token['data']);
-						$transfig = new \Transfiguration($content, $temp_data, $this->base_include_path);
-						$inc_tokens = $transfig->parser->exportTokens();
-						$this->appendTokens($i,$inc_tokens);
-					}
-
-
+					$this->include($token,$i);
 					break;
+				
+				case 'REQUIRE':
+
+					$this->include($token,$i);
+					break;
+
 				case 'ECHO':
 
 					$this->setToken($i, $this->Evaluator->evaluate($token["content"],$token_data));
@@ -239,6 +232,19 @@ class Parser {
 
 
 
+	}
+
+	public function include($token=[], $i=-1) {
+		$require_path = $this->Evaluator->evaluate($token['content'], $token['data']);
+		$require_path = $this->base_include_path.  $require_path;
+
+		if (file_exists($require_path)) {
+			$content = file_get_contents($require_path);
+			$temp_data = array_merge($this->Evaluator->data, $token['data']);
+			$transfig = new \Transfiguration($content, $temp_data, $this->base_include_path);
+			$inc_tokens = $transfig->parser->exportTokens();
+			$this->appendTokens($i,$inc_tokens);
+		}
 	}
 
 	public function findEnd($token=[], $position) {
