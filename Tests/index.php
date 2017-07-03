@@ -5,7 +5,9 @@ $data = [
 	"awesome" => 1+2,
 	"tests" => [
 		"makis",
-		"giorgos"
+		"giorgos",
+		"steve",
+		"kastas"
 	]
 ];
 
