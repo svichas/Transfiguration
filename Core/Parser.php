@@ -235,12 +235,15 @@ class Parser {
 	}
 
 	public function include($token=[], $i=-1) {
-		$require_path = $this->Evaluator->evaluate($token['content'], $token['data']);
+		
+		$token_data = isset($token['data']) ? $token['data'] : [];
+
+		$require_path = $this->Evaluator->evaluate($token['content'], $token_data);
 		$require_path = $this->base_include_path.  $require_path;
 
 		if (file_exists($require_path)) {
 			$content = file_get_contents($require_path);
-			$temp_data = array_merge($this->Evaluator->data, $token['data']);
+			$temp_data = array_merge($this->Evaluator->data, $token_data);
 			$transfig = new \Transfiguration($content, $temp_data, $this->base_include_path);
 			$inc_tokens = $transfig->parser->exportTokens();
 			$this->appendTokens($i,$inc_tokens);
