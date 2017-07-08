@@ -4,6 +4,12 @@ namespace Transfiguration\Core;
 
 Class Lexer {
 
+
+	public $blockEnds = [
+		"FOR"   => "ENDFOR",
+		"WHILE" => "ENDWHILE",
+		"IF"    => "ENDIF"
+	];
 	public $html   = "";
 	public $tokens = [];
 
@@ -69,37 +75,19 @@ Class Lexer {
 		$type = strtoupper($type);
 		$ctab = $this->tab;
 
-
-		if ($type == "IF") {
-			$this->tab++;
-		}
-
-		if ($type == "ENDIF" && $ctab > 0) {
-			$this->tab--;
-			$ctab--;
-		}
 		
-		if ($type == "ELSE" && $ctab > 0) {
-			$ctab--;
-		}
-
-		if ($type == "ELSEIF" && $ctab > 0) {
-			$ctab--;
-		}
-
-		if ($type == "FOR") {
+		if (in_array($type, array_keys($this->blockEnds))) {
 			$this->tab++;
 		}
-		if ($type == "ENDFOR" && $ctab > 0) {
+
+		if (in_array($type, $this->blockEnds) && $ctab > 0) {
 			$this->tab--;
 			$ctab--;
 		}
 
-		if ($type == "WHILE") {
-			$this->tab++;
-		}
-		if ($type == "ENDWHILE" && $ctab > 0) {
-			$this->tab--;
+		/* Special case for IF statement */
+
+		if ($type == "ELSE" || $type == "ELSEIF") {
 			$ctab--;
 		}
 

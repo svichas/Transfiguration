@@ -79,3 +79,10 @@ $transfiguration->export();
 ```html
 {{ require 'base/footer.html' }}
 ```
+
+
+<h3>Setting variables</h3>
+
+```html
+{{ var $varname = "varvalue" }}
+```

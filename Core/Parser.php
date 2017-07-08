@@ -8,11 +8,13 @@ class Parser {
 	public $toks = [];
 	public $tokens = [];
 	public $Evaluator;
+
 	public $blockEnds = [
 		"FOR" => "ENDFOR",
 		"WHILE" => "ENDWHILE",
 		"IF" => "ENDIF"
 	];
+	
 	public $base_include_path = "";
 
 	function __construct($tokens = [], $data=[], $path="") {

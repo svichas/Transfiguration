@@ -2,3 +2,22 @@
 {{ for $element in $key : $test }}
 {{ INCLUDE "test.php" }}
 {{ endfor }}
+
+
+
+{{ if 1==2 }}
+
+--here--
+
+{{elseif 2==2}}
+<b>test</b>
+
+{{if $test[1] == 343}}
+	hi
+	{{else}}
+	<b>not</b>
+{{endif}}
+{{else}}
+
+--else--
+{{endif}}
