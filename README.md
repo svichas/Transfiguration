@@ -1,10 +1,12 @@
-<div align="center">
+<p align="center">
 
-	![Transfiguration](transfiguration-logo.png)
+<img src="transfiguration-logo.png">
 
-	<h5 >A light-weight template engine</h5>
+</p>
 
-</div>
+<p align="center">
+<h5 >A light-weight template engine</h5>
+</p>
 
 <p>Transfiguration should be considered an early alpha.</p>
 
