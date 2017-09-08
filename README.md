@@ -1,6 +1,6 @@
 <p align="center">
 
-<img src="transfiguration-logo.png">
+<img src="transfiguration-logo.png" width="325">
 
 </p>
 
