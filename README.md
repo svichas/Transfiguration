@@ -1,10 +1,9 @@
 <div align="center">
-	<h1>
 
 	<img src="transfiguration-logo.png">
 
 	<h5 >A light-weight template engine</h5>
-	</h1>
+	
 </div>
 
 <p>Transfiguration should be considered an early alpha.</p>
