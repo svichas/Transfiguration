@@ -1,7 +1,7 @@
 <div align="center">
 	<h1>
-	
-	![alt](transfiguration-logo.png "transfiguration")
+
+	<img src="transfiguration-logo.png">
 
 	<h5 >A light-weight template engine</h5>
 	</h1>
