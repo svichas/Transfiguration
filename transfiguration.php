@@ -29,6 +29,18 @@ class Transfiguration {
 		$this->path = $path;
 	}
 
+	public function html($html="") {
+		$this->html = $html;
+		return $this;
+	}
+	public function data($data=[]){
+		$this->data = $data;
+		return $this;
+	}
+	public function requirePath($path="") {
+		$this->path = $path;
+		return $this;
+	}
 	public function hook($hook="", $method="") {
 
 		$this->hooks[] = [
