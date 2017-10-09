@@ -13,4 +13,9 @@ $data = [
 
 
 $trans = new Transfiguration(file_get_contents("template.html"), $data, "inc/");
+
+$trans->hook("header", function($content="") {
+	return "<h1>$content</h1>";
+});
+
 $trans->render();

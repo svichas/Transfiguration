@@ -9,6 +9,8 @@ class Parser {
 	public $tokens = [];
 	public $Evaluator;
 
+	public $hooks = [];
+
 	public $blockEnds = [
 		"FOR" => "ENDFOR",
 		"WHILE" => "ENDWHILE",
@@ -17,11 +19,12 @@ class Parser {
 	
 	public $base_include_path = "";
 
-	function __construct($tokens = [], $data=[], $path="") {
+	function __construct($tokens = [], $data=[], $path="", $hooks = []) {
 		$this->toks = $tokens;
 		$this->tokens = $tokens;
 		$this->Evaluator = new Evaluator($data);
 		$this->base_include_path = $path;
+		$this->hooks = $hooks;
 
 		$this->ParseTokens();
 	}
@@ -229,6 +232,25 @@ class Parser {
 					break;
 			}
 
+
+			//check hooks
+
+			foreach ($this->hooks as $hook) {
+				if (strtoupper($token['type']) == strtoupper($hook['hook'])) {
+					$html = call_user_func_array($hook['method'], [
+						"content" => $this->Evaluator->evaluate($token["content"],$token_data)
+					]);
+
+					$this->setToken($i, $html);
+
+				}
+
+			}
+
+
+
+
+
 			$i += 1;
 		}
 
@@ -247,7 +269,7 @@ class Parser {
 			$content = file_get_contents($require_path);
 			$temp_data = array_merge($this->Evaluator->data, $token_data);
 			$transfig = new \Transfiguration($content, $temp_data, $this->base_include_path);
-			$inc_tokens = $transfig->parser->exportTokens();
+			$inc_tokens = $transfig->parserTokens();
 			$this->appendTokens($i,$inc_tokens);
 		}
 	}
