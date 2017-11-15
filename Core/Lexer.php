@@ -27,8 +27,10 @@ Class Lexer {
 
 		$strlen = strlen($this->html);
 		$prevchar = "";
-		$codeBlock = "";
-		$htmlBlock = "";
+		//$codeBlock = "";
+		//$htmlBlock = "";
+
+		$block = "";
 
 		for( $i = 0; $i <= $strlen; $i++ ) {
 
@@ -44,25 +46,25 @@ Class Lexer {
 			if (!$openCodeBlock && $char == "{" && $nextchar == "{") {
 				$skipNext = true;
 				$openCodeBlock = true;
-				$this->createToken("HTML", $htmlBlock);
-				$htmlBlock = "";
+				$this->createToken("HTML", $block);
+				$block = "";
 			} else if ($openCodeBlock && $char == "}" && $nextchar == "}") {
 				$skipNext = true;
 				$openCodeBlock = false;
-				$this->doToken($codeBlock);
-				$codeBlock = "";
+				$this->doToken($block);
+				$block = "";
 			} else if (!$openCodeBlock) {
-				$htmlBlock .= $char;
+				$block .= $char;
 			} else if ($openCodeBlock) {
-				$codeBlock .= $char;
+				$block .= $char;
 			}
 
 
 			$prevchar = $char;
 		}
 
-		$this->createToken("html", $htmlBlock);
-		$htmlBlock = "";
+		$this->createToken("html", $block);
+		$block = "";
 
 	}
 

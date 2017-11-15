@@ -27,6 +27,7 @@ class Transfiguration {
 		$this->html = $html;
 		$this->data = $data;
 		$this->path = $path;
+		
 	}
 
 	public function html($html="") {
