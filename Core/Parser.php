@@ -242,7 +242,6 @@ class Parser {
 					]);
 
 					$this->setToken($i, $html);
-
 				}
 
 			}

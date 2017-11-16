@@ -26,10 +26,6 @@ Class Lexer {
 		$skipNext = false;
 
 		$strlen = strlen($this->html);
-		$prevchar = "";
-		//$codeBlock = "";
-		//$htmlBlock = "";
-
 		$block = "";
 
 		for( $i = 0; $i <= $strlen; $i++ ) {
@@ -59,8 +55,6 @@ Class Lexer {
 				$block .= $char;
 			}
 
-
-			$prevchar = $char;
 		}
 
 		$this->createToken("html", $block);
