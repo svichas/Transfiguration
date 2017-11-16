@@ -169,6 +169,8 @@ class Parser {
 
 					while (!$found_endif&&$step<100000) {
 
+						if (!isset($this->tokens[$step])) continue;
+
 						$if_token = $this->tokens[$step];
 
 						if ($if_token['tab']==$token['tab']) {
