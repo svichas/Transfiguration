@@ -58,7 +58,7 @@ class Transfiguration {
 
 	public function render() {
 		$translator = new Translator($this->parserTokens());
-		//echo $translator->translate();
+		echo $translator->translate();
 		return $this;
 	}
 	
