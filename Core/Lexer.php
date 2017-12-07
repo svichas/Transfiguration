@@ -31,9 +31,11 @@ Class Lexer {
 
 		for( $i = 0; $i <= $strlen; $i++ ) {
 
+			// get current char and next char
 			$char = substr( $this->html, $i, 1);
 			$nextchar = ($strlen >= $i) ? substr( $this->html, $i+1, 1) : "";
 
+			// Code to skip next char.
 			if ($skipNext) {
 				$skipNext = false;
 				continue;
@@ -58,6 +60,8 @@ Class Lexer {
 
 		}
 
+
+		// Create last block
 		$this->createToken("html", $block);
 		$block = "";
 
