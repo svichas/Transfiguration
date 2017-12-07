@@ -1,8 +1,5 @@
 <?php 
-
-/*
-Require Core files.
-*/
+namespace Transfiguration;
 
 use Transfiguration\Core\Lexer;
 use Transfiguration\Core\Translator;
