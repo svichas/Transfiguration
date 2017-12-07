@@ -1,0 +1,12 @@
+{
+    "name": "transfiguration/transfiguration",
+    "type": "library",
+    "description": "A fast and simple templating engine.",
+    "license": "MIT",
+    "require": {
+        "php": "^5.3.3 || ^7.0"
+    },
+    "autoload": {
+        "files": ["Core/Transfiguration_init.php"]
+    },
+}

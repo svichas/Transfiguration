@@ -3,10 +3,6 @@
 /*
 Require Core files.
 */
-require 'Core/Lexer.php';
-require 'Core/Parser.php';
-require 'Core/Translator.php';
-require 'Helpers/Evaluator.php';
 
 use Transfiguration\Core\Lexer;
 use Transfiguration\Core\Translator;
@@ -65,7 +61,7 @@ class Transfiguration {
 
 	public function render() {
 		$translator = new Translator($this->parserTokens());
-		echo $translator->translate();
+		//echo $translator->translate();
 		return $this;
 	}
 	

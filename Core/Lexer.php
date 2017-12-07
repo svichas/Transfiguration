@@ -18,6 +18,7 @@ Class Lexer {
 	function __construct($html = "") {
 		$this->html = $html;
 		$this->createTokens();
+		print_r($this->tokens);
 	}
 
 	private function createTokens() {
