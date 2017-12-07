@@ -8,5 +8,5 @@
     },
     "autoload": {
         "files": ["Core/Transfiguration_init.php"]
-    },
+    }
 }
