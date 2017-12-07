@@ -15,7 +15,7 @@ class Transfiguration {
 	public $path = "";
 	public $html = "";
 	
-	public function __construct($html, $data = [], $path="") {
+	public function __construct($html="", $data = [], $path="") {
 		
 		$this->html = $html;
 		$this->data = $data;

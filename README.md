@@ -12,8 +12,15 @@
 
 <h3>Installation</h3>
 
+<p>Intall with composer:</p>
+
+```
+composer require transfiguration/transfiguration 'dev-master'
+```
+
 ```php
-require 'Transfiguration/transfiguration.php';
+require 'vendor/autoload.php';
+use Transfiguration\Transfiguration;
 ```
 
 <h3>Usage</h3>
