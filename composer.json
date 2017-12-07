@@ -7,6 +7,6 @@
         "php": "^5.3.3 || ^7.0"
     },
     "autoload": {
-        "files": ["Core/Transfiguration_init.php"]
+        "files": ["Transfiguration_init.php"]
     }
 }
