@@ -2,6 +2,7 @@
 namespace Transfiguration\Core;
 
 use Transfiguration\Helpers\Evaluator;
+use Transfiguration\Transfiguration;
 
 class Parser {
 
@@ -269,7 +270,7 @@ class Parser {
 		if (file_exists($require_path)) {
 			$content = file_get_contents($require_path);
 			$temp_data = array_merge($this->Evaluator->data, $token_data);
-			$transfig = new \Transfiguration($content, $temp_data, $this->base_include_path);
+			$transfig = new Transfiguration($content, $temp_data, $this->base_include_path);
 			$inc_tokens = $transfig->parserTokens();
 			$this->appendTokens($i,$inc_tokens);
 		}
