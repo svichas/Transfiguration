@@ -1,12 +1,12 @@
 {
-    "name": "phpform/phpform",
+    "name": "transfiguration/transfiguration",
     "type": "library",
-    "description": "A way to create secure forms with php.",
+    "description": "A light weight templating engine made with php.",
     "license": "MIT",
     "require": {
         "php": "^5.3.3 || ^7.0"
     },
     "autoload": {
-        "files": ["phpform.php"]
+        "files": ["Transfiguration_init.php"]
     }
 }
