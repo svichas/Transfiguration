@@ -1,6 +1,6 @@
 <?php 
 
-// check if is already difined
+// check if is already defined
 if (class_exists("Transfiguration")) {
 	return;
 }
