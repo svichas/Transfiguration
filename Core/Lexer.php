@@ -25,6 +25,7 @@ Class Lexer {
 
 		$openCodeBlock = false;
 		$skipNext = false;
+		$openCommentBlock = false;
 
 		$strlen = strlen($this->html);
 		$block = "";
@@ -52,14 +53,24 @@ Class Lexer {
 				$openCodeBlock = false;
 				$this->doToken($block);
 				$block = "";
-			} else if (!$openCodeBlock) {
+			} else if (!$openCodeBlock 
+			&& !$openCommentBlock 
+			&& $char == "{" 
+			&& $nextchar == "#") { //Open comment block
+				$skipNext = true;
+				$openCommentBlock = true;
+			} else if ($openCommentBlock 
+			&& $char == "#" 
+			&& $nextchar == "}") { //Close comment block
+				$skipNext = true;
+				$openCommentBlock = false;
+			} else if (!$openCodeBlock && !$openCommentBlock) {
 				$block .= $char;
-			} else if ($openCodeBlock) {
+			} else if ($openCodeBlock && !$openCommentBlock) {
 				$block .= $char;
 			}
 
 		}
-
 
 		// Create last block
 		$this->createToken("html", $block);
