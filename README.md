@@ -27,7 +27,13 @@ use Transfiguration\Transfiguration;
 
 ```php
 $data = array();
-$transfiguration = new Transfiguration(file_get_contents("{template path}"), $data, $include_path);
+$transfiguration = new Transfiguration;
+// Setting template html
+$transfiguration->html($templateHtml);
+// Setting template variables
+$transfiguration->data($templateData);
+// Setting template base path for require and include.
+$transfiguration->requirePath($templatePath);
 ```
 
 <h3>Rendering template</h3>
@@ -96,3 +102,11 @@ $transfiguration->export();
 ```html
 {{ var $varname = "varvalue" }}
 ```
+
+
+<h3>Comments</h3>
+
+```html
+{# This is a comment #}
+```
+
