@@ -12,7 +12,7 @@
 
 <h3>Installation</h3>
 
-<p>Intall with composer:</p>
+<p>Install with composer:</p>
 
 ```
 composer require transfiguration/transfiguration 'dev-master'
