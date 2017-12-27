@@ -26,7 +26,6 @@ use Transfiguration\Transfiguration;
 <h3>Usage</h3>
 
 ```php
-$data = array();
 $transfiguration = new Transfiguration;
 // Setting template html
 $transfiguration->html($templateHtml);
