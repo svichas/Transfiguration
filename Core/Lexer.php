@@ -43,12 +43,18 @@ Class Lexer {
 			}
 
 			//Open code block
-			if (!$openCodeBlock && $char == "{" && $nextchar == "{") {
+			if (!$openCodeBlock 
+				&& !$openCommentBlock
+				&& $char == "{" 
+				&& $nextchar == "{") {
 				$skipNext = true;
 				$openCodeBlock = true;
 				$this->createToken("HTML", $block);
 				$block = "";
-			} else if ($openCodeBlock && $char == "}" && $nextchar == "}") {
+			} else if ($openCodeBlock 
+				&& !$openCommentBlock
+				&& $char == "}" 
+				&& $nextchar == "}") {
 				$skipNext = true;
 				$openCodeBlock = false;
 				$this->doToken($block);
