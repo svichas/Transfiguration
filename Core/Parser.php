@@ -83,34 +83,33 @@ class Parser {
 
 					break;
 
+
 				case "FOR":
+
+					// find ENDFOR position in tempalte.
 					$for_tokens = $this->findEnd($token, $i);
 
-					//$for_token
-					//function doFor($for_tokens = [], $for_array = "", $for_var = "", $for_key="")
-
+					// split in 
 					$token_content_array = preg_split("/in/i", $token['content']);
 
+					// for variable
+					$for_key   = "";
 					$for_var = $token_content_array[0];
+					$for_var_array = $token_content_array[1];
 
-					$value_array = explode(":", $token_content_array[1]);
-
-					$key   = "";
-					$for_var_array = "";
-
-					if (count($value_array) == 2) {
-						$key   = $value_array[0];
-						$for_var_array = $value_array[1];
-					} else if (count($value_array) == 1) {
-						$for_var_array = $value_array[0];
+					//get for key var
+					if (count(explode(":", $for_var)) == 2) {
+						$for_var_explode = explode(":", $for_var);
+						$for_key = $for_var_explode[0];
+						$for_var = $for_var_explode[1];
 					}
 
-					$return_fors = $this->Evaluator->doFor($for_tokens, $for_var_array, $for_var, $key);
+
+					$return_fors = $this->Evaluator->doFor($for_tokens, $for_var_array, $for_var, $for_key);
 					$this->appendTokens($i, $return_fors);
 
-					//recompile
+					//recompile template from start
 					$i = 0;
-
 
 					break;
 
