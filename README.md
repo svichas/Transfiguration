@@ -55,7 +55,7 @@ $transfiguration->export();
 
 ```html
 <ul>
-{{ for $value in $key : $var }}
+{{ for $key : $value in var }}
 	<li>{{ echo $key . " " . $value}}</li>
 {{endfor}}
 </ul>
