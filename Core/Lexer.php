@@ -1,13 +1,15 @@
 <?php 
-
 namespace Transfiguration\Core;
 
+
+
+/**
+* Class for translating plain text (Transfiguration code) to tokens.
+*/
 Class Lexer {
 
 
-	/**
-	*
-	*/
+	// Initialising variables
 	public $blockEnds = [
 		"FOR"   => "ENDFOR",
 		"WHILE" => "ENDWHILE",
@@ -16,21 +18,34 @@ Class Lexer {
 	public $html   = "";
 	public $tokens = [];
 
+	// Tab for closing tags (if, for, etc)
 	public $tab = 0;
 
+
+	/**
+	* Default method getting html.
+	*/
 	function __construct($html = "") {
+		// getting html
 		$this->html = $html;
+		// calling method to create tokens from html
 		$this->createTokens();
-		//print_r($this->tokens);
 	}
 
+
+	/**
+	* Method for translating plain text (Transfiguration code) to tokens.
+	*/
 	private function createTokens() {
 
-		$openCodeBlock = false;
-		$skipNext = false;
-		$openCommentBlock = false;
+		$openCodeBlock = false; // boolean flag for code block
+		$skipNext = false; // skip next character
+		$openCommentBlock = false; // boolean flag for comments 
 
+
+		// string length
 		$strlen = strlen($this->html);
+		// current block contents
 		$block = "";
 
 		for( $i = 0; $i <= $strlen; $i++ ) {
@@ -87,16 +102,26 @@ Class Lexer {
 
 	}
 
+
+	/**
+	* Method to return html tokens
+	*/
 	function exportTokens() {
 		return $this->tokens;
 	}
 	
+
+	/**
+	* Method to create a single token.
+	* @param $type : token type
+	* @param $content : token content
+	*/
 	private function createToken($type="", $content="") {
 
 		$type = strtoupper($type);
 		$ctab = $this->tab;
-
 		
+		// handling tabs
 		if (in_array($type, array_keys($this->blockEnds))) {
 			$this->tab++;
 		}
@@ -112,27 +137,43 @@ Class Lexer {
 			$ctab--;
 		}
 
+
+		// appending token to tokens
 		$this->tokens[] = [
 			"type" => $type,
 			"content" => $content,
 			"tab" => $ctab
 		];
 
-
+		return true;
 	
 	}
 
+	/**
+	* Method to create token
+	* @param $content : code block contents
+	*/
 	private function doToken($content="") {
 		$token_type = $this->findCodeType($content);
 		$token_content = $this->findCodeContent($content);
 		$this->createToken($token_type, $token_content);
 	}
 
+
+	/**
+	* Method to find token type
+	* @param $codeBlock : code block contents
+	*/
 	private function findCodeType($codeBlock) {
 		$codeBlock = ltrim(rtrim($codeBlock, " ")," ");
 		$arr = explode(" ", $codeBlock);
 		return strtoupper($arr[0]); 
 	}
+
+	/**
+	* Method to find token content
+	* @param $codeBlock : code block contents
+	*/
 	private function findCodeContent($codeBlock) {
 		$codeBlock = ltrim(rtrim($codeBlock, " ")," ");
 		$arr = explode(" ", $codeBlock);
