@@ -4,13 +4,17 @@ namespace Transfiguration\Core;
 use Transfiguration\Helpers\Evaluator;
 use Transfiguration\Transfiguration;
 
+/**
+* Class for translating code tokens to html tokens
+*/
 class Parser {
 
+	// Initialising variables
 	public $toks = [];
 	public $tokens = [];
 	public $Evaluator;
 
-	public $hooks = [];
+	public $hooks = []; // variables for transfiguration hooks
 
 	public $blockEnds = [
 		"FOR" => "ENDFOR",
@@ -20,10 +24,13 @@ class Parser {
 	
 	public $base_include_path = "";
 
+	/**
+	* Default method for getting variables and instantiating evaluator object 
+	*/ 
 	function __construct($tokens = [], $data=[], $path="", $hooks = []) {
 		$this->toks = $tokens;
 		$this->tokens = $tokens;
-		$this->Evaluator = new Evaluator($data);
+		$this->Evaluator = new Evaluator($data); // instantiating evaluator object
 		$this->base_include_path = $path;
 		$this->hooks = $hooks;
 
@@ -31,6 +38,9 @@ class Parser {
 	}
 
 
+	/**
+	* Method to translate code tokens to html tokens
+	*/
 	private function parseTokens() {
 
 		$i=0;
@@ -57,6 +67,7 @@ class Parser {
 					break;
 
 				case 'PRINT':
+
 					$this->setToken($i, $this->Evaluator->evaluate($token["content"],$token_data));
 					break;
 
@@ -235,8 +246,9 @@ class Parser {
 			}
 
 
-			//check hooks
-
+			/**
+			* Start check hooks
+			*/
 			foreach ($this->hooks as $hook) {
 				if (strtoupper($token['type']) == strtoupper($hook['hook'])) {
 					$html = call_user_func_array($hook['method'], [
@@ -247,9 +259,9 @@ class Parser {
 				}
 
 			}
-
-
-
+			/**
+			* End check hooks
+			*/
 
 
 			$i += 1;
@@ -259,6 +271,9 @@ class Parser {
 
 	}
 
+	/**
+	* Method to require a transfiguartion template to corrent template
+	*/
 	public function include($token=[], $i=-1) {
 		
 		$token_data = isset($token['data']) ? $token['data'] : [];
@@ -275,6 +290,9 @@ class Parser {
 		}
 	}
 
+	/**
+	* Method to find if,for,etc end
+	*/
 	public function findEnd($token=[], $position) {
 
 		$start_keyword = $token['type'];
@@ -303,6 +321,9 @@ class Parser {
 		return $loop_tokens;
 	}
 
+	/**
+	* Method to append tokens in a position
+	*/
 	private function appendTokens($position=0, $token=[]) {
 
 		$array_part1 = array_slice($this->tokens, 0, $position);
@@ -316,6 +337,9 @@ class Parser {
 
 	}
 
+	/**
+	* Method to remove token in a position
+	*/
 	private function removeToken($position) {
 		$this->tokens[$position] = [
 			"type" => "HTML",
@@ -324,6 +348,9 @@ class Parser {
 		];
 	}
 
+	/**
+	* Method to set token in a position
+	*/
 	private function setToken($position, $value) {
 		$this->tokens[$position] = [
 			"type" => "HTML",
@@ -332,6 +359,9 @@ class Parser {
 		];
 	}
 
+	/**
+	* Method to return tokens
+	*/
 	function exportTokens() {
 		return $this->tokens;
 	}
