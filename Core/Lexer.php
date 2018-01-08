@@ -5,6 +5,9 @@ namespace Transfiguration\Core;
 Class Lexer {
 
 
+	/**
+	*
+	*/
 	public $blockEnds = [
 		"FOR"   => "ENDFOR",
 		"WHILE" => "ENDWHILE",
