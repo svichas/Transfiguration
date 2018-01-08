@@ -5,12 +5,19 @@ use Transfiguration\Core\Lexer;
 use Transfiguration\Core\Translator;
 use Transfiguration\Core\Parser;
 
+
+/**
+* Transiguration main class.
+*/
 class Transfiguration {
 	
+
+	/* Initialise variables */
 	public $requirebase = "";
 	public $parser;
 	public $hooks = [];
 
+	/* Template data */
 	public $data = [];
 	public $path = "";
 	public $html = "";
