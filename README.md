@@ -1,15 +1,12 @@
-<p align="center">
 
-<img src="transfiguration-logo.png" width="325">
-
+<p>
+	<img src="transfiguration-logo.png" width="325">
+	<h5 >A light-weight template engine</h5>
 </p>
 
-<p align="center">
-<h5 >A light-weight template engine</h5>
+<p>
+	[![Travis](https://img.shields.io/travis/svichas/Transfiguration.svg)](https://github.com/svichas/Transfiguration)
 </p>
-
-[![Travis](https://img.shields.io/travis/svichas/Transfiguration.svg)](https://github.com/svichas/Transfiguration)
-
 
 <h3>Installation</h3>
 
