@@ -4,9 +4,7 @@
 	<h5 >A light-weight template engine</h5>
 </p>
 
-<p>
 [![Travis](https://img.shields.io/travis/svichas/Transfiguration.svg)](https://github.com/svichas/Transfiguration)
-</p>
 
 <h3>Installation</h3>
 
