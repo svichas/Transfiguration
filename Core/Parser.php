@@ -28,6 +28,7 @@ class Parser {
 	* Default method for getting variables and instantiating evaluator object 
 	*/ 
 	function __construct($tokens = [], $data=[], $path="", $hooks = []) {
+		print_r($tokens);
 		$this->toks = $tokens;
 		$this->tokens = $tokens;
 		$this->Evaluator = new Evaluator($data); // instantiating evaluator object
@@ -41,7 +42,7 @@ class Parser {
 	/**
 	* Method to translate code tokens to html tokens
 	*/
-	private function parseTokens() {
+	public function parseTokens() {
 
 		$i=0;
 		while ($i<count($this->tokens)) {
@@ -324,7 +325,7 @@ class Parser {
 	/**
 	* Method to append tokens in a position
 	*/
-	private function appendTokens($position=0, $token=[]) {
+	public function appendTokens($position=0, $token=[]) {
 
 		$array_part1 = array_slice($this->tokens, 0, $position);
 		$array_part2 = array_slice($this->tokens, $position+1, count($this->tokens)-1);
@@ -333,14 +334,13 @@ class Parser {
 		$ret_array = array_merge($ret_array, $array_part2);
 
 		$this->tokens = $ret_array;
-		//print_r($this->tokens);
 
 	}
 
 	/**
 	* Method to remove token in a position
 	*/
-	private function removeToken($position) {
+	public function removeToken($position) {
 		$this->tokens[$position] = [
 			"type" => "HTML",
 			"content" => "",
@@ -351,7 +351,7 @@ class Parser {
 	/**
 	* Method to set token in a position
 	*/
-	private function setToken($position, $value) {
+	public function setToken($position, $value) {
 		$this->tokens[$position] = [
 			"type" => "HTML",
 			"content" => $value,

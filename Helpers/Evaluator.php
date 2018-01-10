@@ -58,6 +58,7 @@ class Evaluator {
 		$varname = $this->evalVar($varname, true);
 		// appending var with name and content in variables.
 		$this->data[$varname] = $this->evaluate($varcontent);
+		return true;
 	}
 
 

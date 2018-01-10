@@ -35,6 +35,8 @@ class Transfiguration {
 		$this->data = $data;
 		$this->path = $path;
 		
+		return true;
+
 	}
 
 

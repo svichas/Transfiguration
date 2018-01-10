@@ -36,7 +36,7 @@ Class Lexer {
 	/**
 	* Method for translating plain text (Transfiguration code) to tokens.
 	*/
-	private function createTokens() {
+	public function createTokens() {
 
 		$openCodeBlock = false; // boolean flag for code block
 		$skipNext = false; // skip next character
@@ -116,7 +116,7 @@ Class Lexer {
 	* @param $type : token type
 	* @param $content : token content
 	*/
-	private function createToken($type="", $content="") {
+	public function createToken($type="", $content="") {
 
 		$type = strtoupper($type);
 		$ctab = $this->tab;
@@ -153,7 +153,7 @@ Class Lexer {
 	* Method to create token
 	* @param $content : code block contents
 	*/
-	private function doToken($content="") {
+	public function doToken($content="") {
 		$token_type = $this->findCodeType($content);
 		$token_content = $this->findCodeContent($content);
 		$this->createToken($token_type, $token_content);
@@ -164,7 +164,7 @@ Class Lexer {
 	* Method to find token type
 	* @param $codeBlock : code block contents
 	*/
-	private function findCodeType($codeBlock) {
+	public function findCodeType($codeBlock) {
 		$codeBlock = ltrim(rtrim($codeBlock, " ")," ");
 		$arr = explode(" ", $codeBlock);
 		return strtoupper($arr[0]); 
@@ -174,7 +174,7 @@ Class Lexer {
 	* Method to find token content
 	* @param $codeBlock : code block contents
 	*/
-	private function findCodeContent($codeBlock) {
+	public function findCodeContent($codeBlock) {
 		$codeBlock = ltrim(rtrim($codeBlock, " ")," ");
 		$arr = explode(" ", $codeBlock);
 		$content = "";
