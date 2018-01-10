@@ -8,6 +8,9 @@
 <h5 >A light-weight template engine</h5>
 </p>
 
+[![Travis](https://img.shields.io/travis/svichas/Transfiguration.svg)](https://github.com/svichas/Transfiguration)
+
+
 <h3>Installation</h3>
 
 <p>Install with composer:</p>
