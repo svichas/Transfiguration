@@ -5,9 +5,7 @@
 </p>
 
 <p>
-
-	[![Travis](https://img.shields.io/travis/svichas/Transfiguration.svg)](https://github.com/svichas/Transfiguration)
-
+[![Travis](https://img.shields.io/travis/svichas/Transfiguration.svg)](https://github.com/svichas/Transfiguration)
 </p>
 
 <h3>Installation</h3>
