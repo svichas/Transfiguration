@@ -8,8 +8,6 @@
 <h5 >A light-weight template engine</h5>
 </p>
 
-<p>Transfiguration should be considered an early alpha.</p>
-
 <h3>Installation</h3>
 
 <p>Install with composer:</p>
