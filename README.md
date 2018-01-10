@@ -6,6 +6,8 @@
 
 [![Travis](https://img.shields.io/travis/svichas/Transfiguration.svg)](https://github.com/svichas/Transfiguration)
 
+[![GitHub license](https://img.shields.io/github/license/svichas/Transfiguration.svg)](https://github.com/svichas/Transfiguration)
+
 <h3>Installation</h3>
 
 <p>Install with composer:</p>
