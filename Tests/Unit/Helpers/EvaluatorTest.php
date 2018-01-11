@@ -25,6 +25,17 @@ class EvaluatorTest extends TestCase {
 
 	}
 
+	/**
+	* Test evalVarName returns correct var name format.
+	*/
+	public function testEvalVarNameMethod() {
+
+		$evaluator = new Evaluator([]);
+
+		$this->assertEquals($evaluator->evalVarName(" \$testVar ",true), "testVar");
+
+	}
+
 
 
 

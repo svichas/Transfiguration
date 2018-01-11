@@ -55,7 +55,7 @@ class Evaluator {
 	*/
 	public function setVar($varname="", $varcontent="") {
 		// formating var name
-		$varname = $this->evalVar($varname, true);
+		$varname = $this->evalVarName($varname, true);
 		// appending var with name and content in variables.
 		$this->data[$varname] = $this->evaluate($varcontent);
 		return true;
@@ -67,7 +67,7 @@ class Evaluator {
 	* @param $varname : variable name
 	* @param $removedollar : remove dollar from variable name
 	*/
-	public function evalVar($varname = "", $removedollar = false) {
+	public function evalVarName($varname = "", $removedollar = false) {
 		// removing spaces
 		$varname = str_replace(' ', '', $varname);
 		// removing dollar symbol
@@ -86,9 +86,9 @@ class Evaluator {
 	public function doFor($for_tokens = [], $for_array = "", $for_var = "", $for_key="") {
 
 		// formating variables
-		$for_array = $this->evalVar($for_array, true);
-		$for_var   = $this->evalVar($for_var, true);
-		$for_key   = $this->evalVar($for_key, true);
+		$for_array = $this->evalVarName($for_array, true);
+		$for_var   = $this->evalVarName($for_var, true);
+		$for_key   = $this->evalVarName($for_key, true);
 
 		// initialising return tokens
 		$return_fortokens = [];
