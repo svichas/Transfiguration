@@ -1,14 +1,16 @@
-<?php 
+<?php
 use PHPUnit\Framework\TestCase;
 
 use Transfiguration\Core\Hooks;
-
+/**
+* Class to test hooks
+*/
 class HooksTest extends TestCase {
 
 
 	public function testCheckHooksMethodReturnsCorrectContent() {
 
-
+		// Create kook object
 		$hooks = new Hooks([
 			"HEADER" => [
 				"method" => function($content) {
@@ -17,7 +19,7 @@ class HooksTest extends TestCase {
 			]
 		]);
 
-		
+
 		$this->assertEquals($hooks->checkHooks([
 			"type" => "ECHO",
 			"content" => "",
