@@ -45,6 +45,22 @@ $transfiguration->render();
 $transfiguration->export();
 ```
 
+<h3>Transfiguration hooks</h3>
+<p>This method extends Transfiguration templating engine functionality.</p>
+
+```
+$transfiguration->hook("header", function($content="") {
+	return "<h1>{$content}</h1>";
+});
+```
+
+<p>usage in Transfiguration code</p>
+
+```html
+	{{ header 'This is a header.'}}
+```
+
+
 <h2>Transfiguration code</h2>
 
 <h3>For loop</h3>
