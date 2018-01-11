@@ -13,7 +13,7 @@
 <p>Install with composer:</p>
 
 ```
-composer require transfiguration/transfiguration 'dev-master'
+composer require transfiguration/transfiguration 1.*
 ```
 
 ```php
