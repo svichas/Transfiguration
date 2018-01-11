@@ -27,6 +27,9 @@ class Evaluator {
 	*/
 	public function evaluate($expression, $data = []) {
 
+
+		if (empty($expression)) return false;
+
 		try {
 
 			// extracting variables in order for template to use.
@@ -36,15 +39,14 @@ class Evaluator {
 			//taking first part for security reasons
 			$expression_arr = explode(";" , $expression);
 			$expression = $expression_arr[0];
-		
 			// evaluating string with php function eval.
 			@eval("\$__result__ = ".$expression.";");
 
 			// returing result of eval function.
-			return $__result__;
+			return eval("return {$expression};");
 		} catch (Exception $e) {
 			// incase of error die and print error.
-			die($e);
+			return false;
 		}
 	}
 

@@ -8,6 +8,7 @@ if (class_exists("Transfiguration")) {
 /*
 Require all files for transfiguration
 */
+require 'Core/Hooks.php';
 require 'Core/Lexer.php';
 require 'Core/Parser.php';
 require 'Core/Translator.php';

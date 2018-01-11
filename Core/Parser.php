@@ -1,6 +1,7 @@
 <?php
 namespace Transfiguration\Core;
 
+use transfiguration\Core\Hooks;
 use Transfiguration\Helpers\Evaluator;
 use Transfiguration\Transfiguration;
 
@@ -13,8 +14,9 @@ class Parser {
 	public $toks = [];
 	public $tokens = [];
 	public $Evaluator;
+	public $hooker;
 
-	public $hooks = []; // variables for transfiguration hooks
+	//public $hooks = []; // variables for transfiguration hooks
 
 	public $blockEnds = [
 		"FOR" => "ENDFOR",
@@ -28,13 +30,11 @@ class Parser {
 	* Default method for getting variables and instantiating evaluator object 
 	*/ 
 	function __construct($tokens = [], $data=[], $path="", $hooks = []) {
-		print_r($tokens);
 		$this->toks = $tokens;
 		$this->tokens = $tokens;
 		$this->Evaluator = new Evaluator($data); // instantiating evaluator object
 		$this->base_include_path = $path;
-		$this->hooks = $hooks;
-
+		$this->hooks = new Hooks($hooks);
 		$this->ParseTokens();
 	}
 
@@ -250,6 +250,7 @@ class Parser {
 			/**
 			* Start check hooks
 			*/
+			/*
 			foreach ($this->hooks as $hook) {
 				if (strtoupper($token['type']) == strtoupper($hook['hook'])) {
 					$html = call_user_func_array($hook['method'], [
@@ -260,6 +261,12 @@ class Parser {
 				}
 
 			}
+			*/
+			if ($token["type"] != "HTML") {
+				$result = $this->hooks->checkHooks($token,$this->Evaluator->evaluate($token["content"],$token_data));
+				if ($result) $this->setToken($i, $result);
+			}
+
 			/**
 			* End check hooks
 			*/

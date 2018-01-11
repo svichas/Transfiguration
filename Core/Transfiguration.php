@@ -77,9 +77,11 @@ class Transfiguration {
 	* @param $method : PHP anonymous function for hook.
 	*/
 	public function hook($hook="", $method="") {
+		
+		$hook = strtoupper($hook);
 
-		$this->hooks[] = [
-			"hook" => $hook,
+		$this->hooks[$hook] = [
+			//"hook" => $hook,
 			"method" => $method
 		];
 
