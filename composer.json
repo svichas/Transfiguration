@@ -4,7 +4,7 @@
     "description": "A light weight templating engine made with php.",
     "license": "MIT",
     "require": {
-        "php": "^5.6 || ^7.0"
+        "php": " ^7.0 || ^7.1 || ^7.2"
     },
     "autoload": {
         "files": ["Transfiguration.php"]
