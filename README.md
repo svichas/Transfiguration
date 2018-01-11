@@ -57,7 +57,7 @@ $transfiguration->hook("header", function($content="") {
 <p>usage in Transfiguration code</p>
 
 ```html
-	{{ header 'This is a header.'}}
+{{ header 'This is a header.'}}
 ```
 
 
