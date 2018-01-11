@@ -8,6 +8,8 @@
 
 <h3>Installation</h3>
 
+<p>PHP versions supported: 7.0, 7.1, 7.2</p>
+
 <p>Install with composer:</p>
 
 ```
