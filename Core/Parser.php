@@ -44,6 +44,7 @@ class Parser {
 	*/
 	public function parseTokens() {
 
+
 		$i=0;
 		while ($i<count($this->tokens)) {
 
@@ -97,6 +98,8 @@ class Parser {
 
 
 				case "FOR":
+
+
 
 					// find ENDFOR position in tempalte.
 					$for_tokens = $this->findEnd($token, $i);
@@ -242,34 +245,24 @@ class Parser {
 					break;
 
 				default:
-					# code...
+				
+					/**
+					* Start check hooks
+					*/
+
+					if ($token["type"] != "HTML") {
+						$result = $this->hooks->checkHooks($token,$this->Evaluator->evaluate($token["content"],$token_data));
+						if ($result) $this->setToken($i, $result);
+					}
+
+					/**
+					* End check hooks
+					*/
+
 					break;
 			}
 
 
-			/**
-			* Start check hooks
-			*/
-			/*
-			foreach ($this->hooks as $hook) {
-				if (strtoupper($token['type']) == strtoupper($hook['hook'])) {
-					$html = call_user_func_array($hook['method'], [
-						"content" => $this->Evaluator->evaluate($token["content"],$token_data)
-					]);
-
-					$this->setToken($i, $html);
-				}
-
-			}
-			*/
-			if ($token["type"] != "HTML") {
-				$result = $this->hooks->checkHooks($token,$this->Evaluator->evaluate($token["content"],$token_data));
-				if ($result) $this->setToken($i, $result);
-			}
-
-			/**
-			* End check hooks
-			*/
 
 
 			$i += 1;
@@ -341,7 +334,6 @@ class Parser {
 		$ret_array = array_merge($ret_array, $array_part2);
 
 		$this->tokens = $ret_array;
-
 	}
 
 	/**

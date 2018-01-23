@@ -40,7 +40,6 @@ class Evaluator {
 			$expression_arr = explode(";" , $expression);
 			$expression = $expression_arr[0];
 			// evaluating string with php function eval.
-			//@eval("\$__result__ = ".$expression.";");
 
 			// returing result of eval function.
 			return eval("return {$expression};");
