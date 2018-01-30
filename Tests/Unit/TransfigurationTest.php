@@ -75,4 +75,21 @@ class TransfigurationTest extends TestCase {
 
 	}
 
+	/**
+	* Test if transfiguration comments are working correctly
+	*/
+	public function testTransfigurationComments() {
+
+		$transfiguration = new Transfiguration();
+		$transfiguration->html('--start--{# this is a comment #}--end--');
+		$transfiguration->data([
+			"item" => "1"
+		]);
+
+		// test if transfiguration export is the correct result.
+		$this->assertEquals($transfiguration->export(), "--start----end--");
+
+
+	}
+
 }
