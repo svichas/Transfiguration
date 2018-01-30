@@ -23,5 +23,56 @@ class TransfigurationTest extends TestCase {
 
 	}
 
+	/**
+	* Test for Transfiguration echo command
+	*/
+	public function testTransfigurationEcho() {
+
+		$transfiguration = new Transfiguration();
+		$transfiguration->html('--start--{{echo "test".$item}}--end--');
+		$transfiguration->data([
+			"item" => "1"
+		]);
+
+
+		// test if transfiguration export is the correct result.
+		$this->assertEquals($transfiguration->export(), "--start--test1--end--");
+
+	}
+
+
+	/**
+	* Test for Transfiguration if else statment
+	*/
+	public function testTransfigurationIfElseStatment() {
+
+		$transfiguration = new Transfiguration();
+		$transfiguration->html('--start--{{if $item==1}}correct{{else}}error{{endif}}--end--');
+		$transfiguration->data([
+			"item" => "1"
+		]);
+
+
+		// test if transfiguration export is the correct result.
+		$this->assertEquals($transfiguration->export(), "--start--correct--end--");
+
+	}
+
+
+	/**
+	* Test for Transfiguration if elseif statment
+	*/
+	public function testTransfigurationIfElseIfStatment() {
+
+		$transfiguration = new Transfiguration();
+		$transfiguration->html('--start--{{if $item==2}}error{{elseif $item==1}}correct{{endif}}--end--');
+		$transfiguration->data([
+			"item" => "1"
+		]);
+
+		// test if transfiguration export is the correct result.
+		$this->assertEquals($transfiguration->export(), "--start--correct--end--");
+
+	}
 
 }
