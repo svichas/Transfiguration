@@ -12,14 +12,14 @@ class TransfigurationTest extends TestCase {
 
 
 		$transfiguration = new Transfiguration();
-		$transfiguration->html("--start--{{ for $key : $item in $items }}{{ echo $item }}{{ endfor }}--end--");
+		$transfiguration->html('--start--{{ for $key : $item in $items }}{{ echo $item }}{{ endfor }}--end--');
 		$transfiguration->data([
 			"items" => ["item1","item2","item3"]
 		]);
 
+
 		// test if transfiguration export is the correct result.
 		$this->assertEquals($transfiguration->export(), "--start--item1item2item3--end--");
-
 
 	}
 
