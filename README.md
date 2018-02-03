@@ -10,6 +10,8 @@
 
 <p>PHP versions supported: 7.0, 7.1 and 7.2</p>
 
+***
+
 <p>Install with composer: <b>(recommended)</b></p>
 
 ```
@@ -21,10 +23,11 @@ require 'vendor/autoload.php';
 use Transfiguration\Transfiguration;
 ```
 
-
+---
 
 <p>Download latest realease: <a href="https://github.com/svichas/Transfiguration/releases">here</a></p>
 
+***
 
 <h3>Usage</h3>
 
@@ -67,6 +70,7 @@ $transfiguration->hook("header", function($content="") {
 {{ header 'This is a header.'}}
 ```
 
+*** 
 
 <h2>Transfiguration code</h2>
 
