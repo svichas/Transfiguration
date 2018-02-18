@@ -54,11 +54,11 @@ class Evaluator {
 	* @param $varname : variable name to set.
 	* @param $varcontent : content of variable to set.
 	*/
-	public function setVar($varname="", $varcontent="") {
+	public function setVar($varname="", $varcontent="", $token_data) {
 		// formating var name
 		$varname = $this->evalVarName($varname, true);
 		// appending var with name and content in variables.
-		$this->data[$varname] = $this->evaluate($varcontent);
+		$this->data[$varname] = $this->evaluate($varcontent, $token_data);
 		return true;
 	}
 

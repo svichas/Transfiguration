@@ -91,7 +91,7 @@ class Parser {
 		    			}
 
 					}
-					$this->Evaluator->setVar($varname, $varcontent);
+					$this->Evaluator->setVar($varname, $varcontent, $token_data);
 					$this->removeToken($i);
 
 					break;
