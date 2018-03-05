@@ -89,6 +89,22 @@ class TransfigurationTest extends TestCase {
 		// test if transfiguration export is the correct result.
 		$this->assertEquals($transfiguration->export(), "--start----end--");
 
+	}
+
+	/**
+	* Test if transfiguration require is working correctly
+	*/
+	public function testTransigurationRequire() {
+		
+		$transfiguration = new Transfiguration();
+		$transfiguration->html('--start--{{ require "test_require_file.html.transfiguration" }}--end--');
+		$transfiguration->requirePath(dirname(__FILE__).DIRECTORY_SEPARATOR);
+		$transfiguration->data([
+			"item" => "1"
+		]);
+
+		// test if transfiguration export is the correct result.
+		$this->assertEquals($transfiguration->export(), "--start--<b>test-content</b>--end--");
 
 	}
 

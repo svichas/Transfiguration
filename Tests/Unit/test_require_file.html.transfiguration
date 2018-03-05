@@ -1,0 +1,1 @@
+<b>{{ echo "test-content" }}</b>
