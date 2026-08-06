@@ -1,36 +1,53 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Transfiguration\Core;
 
 /**
-* Class for transfiguration hooks to extend transfiguration functionality.
-*/
-class Hooks {
+ * Class for transfiguration hooks to extend template functionality.
+ */
+class Hooks
+{
+    /**
+     * Registered hooks keyed by uppercase token type.
+     *
+     * @var array<string, array{method: callable}>
+     */
+    private $hooks = [];
 
-	public $hooks = [];
+    /**
+     * @param array<string, array{method: callable}> $hooks
+     */
+    public function __construct(array $hooks = [])
+    {
+        // Normalize hook keys to uppercase.
+        foreach ($hooks as $key => $hook) {
+            $this->hooks[strtoupper($key)] = $hook;
+        }
+    }
 
-	/**
-	* Main method to parse hooks to this class.
-	*/
-	public function __construct($hooks=[]) {
-		$this->hooks = $hooks;
-	}
+    /**
+     * Check if a token matches a registered hook and return the hook's result.
+     *
+     * @param array{type?: string, content?: string, tab?: int} $token
+     * @param string $content The evaluated content to pass to the hook.
+     * @return mixed The hook result, or false if no hook matched.
+     */
+    public function checkHooks(array $token = [], string $content = '')
+    {
+        $tokenType = strtoupper((string)($token['type'] ?? ''));
 
-	/**
-	* Method to check a token if matches with any hook and return hook result
-	*/
-	public function checkHooks($token=[],$content="") {
+        if (!isset($this->hooks[$tokenType])) {
+            return false;
+        }
 
-		// capitalize token type
-		$token['type'] = strtoupper($token['type']);
+        $hook = $this->hooks[$tokenType];
 
-		// if token type not exists in hooks leave method.
-		if (!isset($this->hooks[$token['type']])) return false;
+        if (!isset($hook['method']) || !is_callable($hook['method'])) {
+            return false;
+        }
 
-		// get token hook if matches
-		$hook = $this->hooks[$token['type']];
-
-		// return method result
-		return call_user_func_array($hook['method'], [ "content" => $content ]);
-	}
-
+        return ($hook['method'])($content);
+    }
 }

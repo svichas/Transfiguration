@@ -1,119 +1,139 @@
-<?php 
+<?php
+
+declare(strict_types=1);
+
 namespace Transfiguration;
 
 use Transfiguration\Core\Lexer;
 use Transfiguration\Core\Translator;
 use Transfiguration\Core\Parser;
 
-
 /**
-* Transiguration main class.
-*/
-class Transfiguration {
-	
+ * Transfiguration main class — lightweight PHP template engine.
+ */
+class Transfiguration
+{
+    /** @var string Base path for include/require resolution. */
+    private $includePath = '';
 
-	/* Initialise variables */
-	public $requirebase = "";
-	public $parser;
-	public $hooks = [];
+    /** @var Parser|null Cached parser instance. */
+    private $parser;
 
-	/* Template data */
-	public $data = [];
-	public $path = "";
-	public $html = "";
-	
+    /** @var array<string, array{method: callable}> Registered hooks. */
+    private $hooks = [];
 
-	/**
-	* Instantiation of the class function.
-	* @param $html : Transfiguration template html to transfigure.
-	* @param $data : Variables for transfiguration template.
-	* @param $path : Path for Include/Require base.
-	*/
-	public function __construct($html="", $data = [], $path="") {
-		
-		$this->html = $html;
-		$this->data = $data;
-		$this->path = $path;
-		
-		return true;
+    /** @var array<string, mixed> Template variable bindings. */
+    private $data = [];
 
-	}
+    /** @var string Raw template HTML. */
+    private $html = '';
 
+    /**
+     * @param string $html Transfiguration template source.
+     * @param array<string, mixed> $data Template variables.
+     * @param string $path Base path for include/require.
+     */
+    public function __construct(string $html = '', array $data = [], string $path = '')
+    {
+        $this->html = $html;
+        $this->data = $data;
+        $this->includePath = $path;
+    }
 
-	/**
-	* Function to set transfiguration template html.
-	* @param $html : Transfiguration template html to transfigure.
-	*/
-	public function html($html="") {
-		$this->html = $html;
-		return $this;
-	}
+    /**
+     * Set the template HTML source.
+     *
+     * @param string $html
+     * @return $this
+     */
+    public function html(string $html = ''): self
+    {
+        $this->html = $html;
+        $this->parser = null; // invalidate cached parser
+        return $this;
+    }
 
+    /**
+     * Set template variable bindings.
+     *
+     * @param array<string, mixed> $data
+     * @return $this
+     */
+    public function data(array $data = []): self
+    {
+        $this->data = $data;
+        $this->parser = null;
+        return $this;
+    }
 
-	/**
-	* Function to set transfiguration template variables.
-	* @param $data : Variables for transfiguration template.
-	*/
-	public function data($data=[]){
-		$this->data = $data;
-		return $this;
-	}
+    /**
+     * Set the base path for include/require resolution.
+     *
+     * @param string $path
+     * @return $this
+     */
+    public function requirePath(string $path = ''): self
+    {
+        $this->includePath = $path;
+        $this->parser = null;
+        return $this;
+    }
 
+    /**
+     * Register a hook for a custom token type.
+     *
+     * @param string $hook Token type name (case-insensitive).
+     * @param callable $method Callback receiving content string.
+     * @return $this
+     */
+    public function hook(string $hook = '', callable $method = null): self
+    {
+        $this->hooks[strtoupper($hook)] = [
+            'method' => $method,
+        ];
+        $this->parser = null;
+        return $this;
+    }
 
-	/**
-	* Function to set path for Include/Require base.
-	* @param $path : Path for Include/Require base.
-	*/
-	public function requirePath($path="") {
-		$this->path = $path;
-		return $this;
-	}
+    /**
+     * Parse the template and return the token list.
+     *
+     * @return array<int, array>
+     */
+    public function parserTokens(): array
+    {
+        if ($this->parser === null) {
+            $lexer = new Lexer($this->html);
+            $this->parser = new Parser(
+                $lexer->exportTokens(),
+                $this->data,
+                $this->includePath,
+                $this->hooks
+            );
+        }
+        return $this->parser->exportTokens();
+    }
 
+    /**
+     * Export the rendered template as a string.
+     *
+     * @return string
+     */
+    public function export(): string
+    {
+        $translator = new Translator($this->parserTokens());
+        return $translator->translate();
+    }
 
-
-	/**
-	* Function to set hooks for transfiguration template.
-	* @param $hook : Hook command.
-	* @param $method : PHP anonymous function for hook.
-	*/
-	public function hook($hook="", $method="") {
-		
-		$hook = strtoupper($hook);
-
-		$this->hooks[$hook] = [
-			//"hook" => $hook,
-			"method" => $method
-		];
-
-		return $this;
-	}
-
-
-	/**
-	* Function to get parser tokens.
-	*/
-	public function parserTokens() {
-		$lexer = new Lexer($this->html);
-		$this->parser = new Parser($lexer->exportTokens(), $this->data, $this->path, $this->hooks);
-		return $this->parser->exportTokens();
-	}
-
-
-	/**
-	* Function to export transfiguration template html as a string.
-	*/
-	public function export() {
-		$translator = new Translator($this->parserTokens());
-		return $translator->translate();
-	}
-
-	/**
-	* Function to echo transfiguration template html.
-	*/
-	public function render() {
-		$translator = new Translator($this->parserTokens());
-		echo $translator->translate();
-		return $this;
-	}
-	
+    /**
+     * Render (echo) the template and return $this for chaining.
+     *
+     * @return $this
+     */
+    public function render(): self
+    {
+        $translator = new Translator($this->parserTokens());
+        echo $translator->translate();
+        return $this;
+    }
 }

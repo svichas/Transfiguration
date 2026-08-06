@@ -1,20 +1,37 @@
 
-<p>
-	<img src="transfiguration-logo.png" width="325">
-	<h5 >A light-weight template engine</h5>
+<p align="center">
+  <img src="transfiguration-logo.png" width="325" alt="Transfiguration logo">
 </p>
 
-[![Travis](https://img.shields.io/travis/svichas/Transfiguration.svg)](https://github.com/svichas/Transfiguration) [![GitHub license](https://img.shields.io/github/license/svichas/Transfiguration.svg)](https://github.com/svichas/Transfiguration) [![Packagist](https://img.shields.io/packagist/v/Transfiguration/Transfiguration.svg)](https://packagist.org/packages/transfiguration/transfiguration)
+<h1 align="center">Transfiguration</h1>
+<p align="center"><strong>A lightweight, secure PHP template engine</strong></p>
 
-<h3>Installation</h3>
+<p align="center">
+  <a href="https://github.com/svichas/Transfiguration"><img src="https://img.shields.io/travis/svichas/Transfiguration.svg" alt="Build Status"></a>
+  <a href="https://github.com/svichas/Transfiguration"><img src="https://img.shields.io/github/license/svichas/Transfiguration.svg" alt="License"></a>
+  <a href="https://packagist.org/packages/transfiguration/transfiguration"><img src="https://img.shields.io/packagist/v/Transfiguration/Transfiguration.svg" alt="Packagist"></a>
+</p>
 
-<p>PHP versions supported: 7.0, 7.1 and 7.2</p>
+---
 
-***
+Transfiguration is a minimal, no-bloat template engine for PHP. It compiles a clean, custom syntax into plain HTML — no heavyweight compilers, no caching layers, just simple and fast rendering.
 
-<p>Install with composer: <b>(recommended)</b></p>
+## ✨ Features
 
-```
+- **Simple syntax** — `{{ }}` code blocks, familiar control flow
+- **Safe by default** — template expressions are evaluated through a secure parser; no raw `eval()` on user input
+- **Path traversal protection** — `include`/`require` are sandboxed to a configurable base directory
+- **Extensible hooks** — register custom tag handlers to extend the engine with your own DSL
+- **Zero dependencies** — works as a standalone library or via Composer
+- **PHP 7.0+** compatible
+
+---
+
+## 📦 Installation
+
+### Via Composer (recommended)
+
+```bash
 composer require transfiguration/transfiguration 1.*
 ```
 
@@ -23,112 +40,178 @@ require 'vendor/autoload.php';
 use Transfiguration\Transfiguration;
 ```
 
----
+### Manual download
 
-<p>Download latest realease: <a href="https://github.com/svichas/Transfiguration/releases">here</a></p>
-
-***
-
-<h3>Usage</h3>
+Download the [latest release](https://github.com/svichas/Transfiguration/releases) and require the entry point:
 
 ```php
-$transfiguration = new Transfiguration;
-// Setting template html
-$transfiguration->html($templateHtml);
-// Setting template variables
-$transfiguration->data($templateData);
-// Setting template base path for require and include.
-$transfiguration->requirePath($templatePath);
+require 'path/to/Transfiguration/Transfiguration.php';
+use Transfiguration\Transfiguration;
 ```
 
-<h3>Rendering template</h3>
-<p>This function is printing template html into the page.</p>
+---
+
+## 🚀 Quick Start
+
+```php
+$transfiguration = new Transfiguration();
+
+$transfiguration
+    ->html('<h1>{{ echo $title }}</h1>')
+    ->data(['title' => 'Hello, World!'])
+    ->render();
+// Output: <h1>Hello, World!</h1>
+```
+
+---
+
+## 📖 Usage Guide
+
+### Setting up a template
+
+```php
+$transfiguration = new Transfiguration();
+
+$transfiguration
+    ->html($templateHtml)              // raw template string
+    ->data($templateVariables)         // key-value bindings
+    ->requirePath('/path/to/templates'); // base path for includes
+```
+
+### Rendering
+
+Echo the compiled template directly:
 
 ```php
 $transfiguration->render();
 ```
 
-<h3>Exporting template</h3>
-<p>This function returns executed template html.</p>
+Return the compiled template as a string:
 
 ```php
-$transfiguration->export();
+$html = $transfiguration->export();
 ```
 
-<h3>Transfiguration hooks</h3>
-<p>This method extends Transfiguration templating engine functionality.</p>
+---
 
-```
-$transfiguration->hook("header", function($content="") {
-	return "<h1>{$content}</h1>";
-});
-```
+## 🧩 Template Syntax
 
-<p>usage in Transfiguration code</p>
+### Echo / Print
+
+Output a variable or expression:
 
 ```html
-{{ header 'This is a header.'}}
+{{ echo $username }}
+{{ echo "Welcome, " . $name }}
+{{ print $item.price }}
 ```
 
-*** 
+### Variables
 
-<h2>Transfiguration code</h2>
-
-<h3>For loop</h3>
+Declare variables inside templates:
 
 ```html
-<ul>
-{{ for $key : $value in var }}
-	<li>{{ echo $key . " " . $value}}</li>
-{{endfor}}
-</ul>
+{{ var $greeting = "Hello" }}
+{{ echo $greeting }}
 ```
 
-<h3>If statement</h3>
+### Conditionals
+
+Full `if` / `elseif` / `else` support:
 
 ```html
-{{ if $loggedin == true}}
-	<b>User logged in!</b>
-{{ elseif $guest == true }}
-	<b>User is guest!</b>
+{{ if $user.loggedIn }}
+    <b>Welcome back, {{ echo $user.name }}!</b>
+{{ elseif $user.isGuest }}
+    <b>Hello, guest!</b>
 {{ else }}
- 	<b>User not logged in!</b>
+    <a href="/login">Log in</a>
 {{ endif }}
 ```
 
-<h3>Print & Echo</h3>
+### Loops
+
+Iterate over arrays with optional key:
 
 ```html
-{{echo "string"}}
+<ul>
+{{ for $item in $items }}
+    <li>{{ echo $item }}</li>
+{{ endfor }}
+</ul>
 ```
-<p>or</p>
+
+With key-value access:
 
 ```html
-{{print "string"}}
+<ul>
+{{ for $id : $product in $products }}
+    <li>{{ echo $id }} — {{ echo $product.name }}</li>
+{{ endfor }}
+</ul>
 ```
 
-<h3>Including files</h3>
+### Includes
+
+Pull in other templates (paths are relative to `requirePath`):
 
 ```html
-{{ include 'base/footer.html' }}
+{{ include 'partials/header.html' }}
+{{ require 'partials/footer.html' }}
 ```
-<p>or</p>
+
+### Comments
 
 ```html
-{{ require 'base/footer.html' }}
+{# This will not appear in the output #}
 ```
 
+---
 
-<h3>Setting variables</h3>
+## 🪝 Hooks
+
+Extend the engine by registering custom tag handlers:
+
+```php
+$transfiguration->hook('header', function(string $content): string {
+    return "<h1 class=\"title\">{$content}</h1>";
+});
+```
+
+Usage in templates:
 
 ```html
-{{ var $varname = "varvalue" }}
+{{ header 'Welcome to my site' }}
 ```
 
+Hooks receive the evaluated content as their argument. The return value replaces the tag in the final output.
 
-<h3>Comments</h3>
+---
 
-```html
-{# This is a comment #}
+## 🔒 Security
+
+Transfiguration takes a defense-in-depth approach:
+
+| Concern | Mitigation |
+|---|---|
+| **Arbitrary code execution** | Template expressions are parsed by a safe recursive-descent evaluator. Only a whitelist of ~30 built-in PHP functions are callable. |
+| **Path traversal** | `include`/`require` paths are resolved with `realpath()` and validated to stay within the configured base directory. |
+| **Variable pollution** | Template data is kept in a dedicated data store — no `extract()` on global scope. |
+
+> ⚠️ Never pass untrusted user input directly as template source. Hooks and the `requirePath` base directory should be under your control.
+
+---
+
+## 🧪 Testing
+
+```bash
+composer install
+./vendor/bin/phpunit
 ```
+
+---
+
+## 📄 License
+
+MIT © [Stefanos Vichas](https://github.com/svichas)
 

@@ -1,192 +1,191 @@
-<?php 
+<?php
+
+declare(strict_types=1);
+
 namespace Transfiguration\Core;
 
-
-
 /**
-* Class for translating plain text (Transfiguration code) to tokens.
-*/
-Class Lexer {
+ * Class for translating plain text (Transfiguration code) to tokens.
+ */
+class Lexer
+{
+    /** @var array<string, string> Block-type to end-keyword mapping. */
+    private $blockEnds = [
+        'FOR'   => 'ENDFOR',
+        'WHILE' => 'ENDWHILE',
+        'IF'    => 'ENDIF',
+    ];
 
+    /** @var string Raw input HTML/template. */
+    private $html = '';
 
-	// Initialising variables
-	public $blockEnds = [
-		"FOR"   => "ENDFOR",
-		"WHILE" => "ENDWHILE",
-		"IF"    => "ENDIF"
-	];
-	public $html   = "";
-	public $tokens = [];
+    /** @var array<int, array{type: string, content: string, tab: int}> Generated tokens. */
+    private $tokens = [];
 
-	// Tab for closing tags (if, for, etc)
-	public $tab = 0;
+    /** @var int Current nesting depth for closing tags. */
+    private $tab = 0;
 
+    /**
+     * @param string $html Template source to lex.
+     */
+    public function __construct(string $html = '')
+    {
+        $this->html = $html;
+        $this->createTokens();
+    }
 
-	/**
-	* Default method getting html.
-	*/
-	function __construct($html = "") {
-		// getting html
-		$this->html = $html;
-		// calling method to create tokens from html
-		$this->createTokens();
-	}
+    /**
+     * Translate plain text (Transfiguration code) into tokens.
+     */
+    public function createTokens(): void
+    {
+        $openCodeBlock = false;
+        $skipNext = false;
+        $openCommentBlock = false;
 
+        $strlen = strlen($this->html);
+        $block = '';
 
-	/**
-	* Method for translating plain text (Transfiguration code) to tokens.
-	*/
-	public function createTokens() {
+        for ($i = 0; $i < $strlen; $i++) {
+            $char = $this->html[$i];
+            $nextChar = ($i + 1 < $strlen) ? $this->html[$i + 1] : '';
 
-		$openCodeBlock = false; // boolean flag for code block
-		$skipNext = false; // skip next character
-		$openCommentBlock = false; // boolean flag for comments 
+            // Skip next character (used after consuming a two-char delimiter).
+            if ($skipNext) {
+                $skipNext = false;
+                continue;
+            }
 
+            // Open code block: {{
+            if (!$openCodeBlock && !$openCommentBlock && $char === '{' && $nextChar === '{') {
+                $skipNext = true;
+                $openCodeBlock = true;
+                $this->createToken('HTML', $block);
+                $block = '';
+                continue;
+            }
 
-		// string length
-		$strlen = strlen($this->html);
-		// current block contents
-		$block = "";
+            // Close code block: }}
+            if ($openCodeBlock && !$openCommentBlock && $char === '}' && $nextChar === '}') {
+                $skipNext = true;
+                $openCodeBlock = false;
+                $this->doToken($block);
+                $block = '';
+                continue;
+            }
 
-		for( $i = 0; $i <= $strlen; $i++ ) {
+            // Open comment block: {#
+            if (!$openCodeBlock && !$openCommentBlock && $char === '{' && $nextChar === '#') {
+                $skipNext = true;
+                $openCommentBlock = true;
+                continue;
+            }
 
-			// get current char and next char
-			$char = substr( $this->html, $i, 1);
-			$nextchar = ($strlen >= $i) ? substr( $this->html, $i+1, 1) : "";
+            // Close comment block: #}
+            if ($openCommentBlock && $char === '#' && $nextChar === '}') {
+                $skipNext = true;
+                $openCommentBlock = false;
+                continue;
+            }
 
-			// Code to skip next char.
-			if ($skipNext) {
-				$skipNext = false;
-				continue;
-			}
+            // Accumulate characters when not inside a comment.
+            if (!$openCommentBlock) {
+                $block .= $char;
+            }
+        }
 
-			//Open code block
-			if (!$openCodeBlock 
-				&& !$openCommentBlock
-				&& $char == "{" 
-				&& $nextchar == "{") {
-				$skipNext = true;
-				$openCodeBlock = true;
-				$this->createToken("HTML", $block);
-				$block = "";
-			} else if ($openCodeBlock 
-				&& !$openCommentBlock
-				&& $char == "}" 
-				&& $nextchar == "}") {
-				$skipNext = true;
-				$openCodeBlock = false;
-				$this->doToken($block);
-				$block = "";
-			} else if (!$openCodeBlock 
-			&& !$openCommentBlock 
-			&& $char == "{" 
-			&& $nextchar == "#") { //Open comment block
-				$skipNext = true;
-				$openCommentBlock = true;
-			} else if ($openCommentBlock 
-			&& $char == "#" 
-			&& $nextchar == "}") { //Close comment block
-				$skipNext = true;
-				$openCommentBlock = false;
-			} else if (!$openCodeBlock && !$openCommentBlock) {
-				$block .= $char;
-			} else if ($openCodeBlock && !$openCommentBlock) {
-				$block .= $char;
-			}
+        // Flush any remaining content as HTML.
+        if ($block !== '') {
+            $this->createToken('HTML', $block);
+        }
+    }
 
-		}
+    /**
+     * Return the generated tokens.
+     *
+     * @return array<int, array{type: string, content: string, tab: int}>
+     */
+    public function exportTokens(): array
+    {
+        return $this->tokens;
+    }
 
-		// Create last block
-		$this->createToken("html", $block);
-		$block = "";
+    /**
+     * Create a single token and append it to the list.
+     *
+     * @param string $type Token type.
+     * @param string $content Token content.
+     * @return bool
+     */
+    public function createToken(string $type = '', string $content = ''): bool
+    {
+        $type = strtoupper($type);
+        $currentTab = $this->tab;
 
-	}
+        // Handle tab nesting for block openers.
+        if (isset($this->blockEnds[$type])) {
+            $this->tab++;
+        }
 
+        // Handle tab nesting for block closers.
+        if (in_array($type, $this->blockEnds, true) && $currentTab > 0) {
+            $this->tab--;
+            $currentTab--;
+        }
 
-	/**
-	* Method to return html tokens
-	*/
-	function exportTokens() {
-		return $this->tokens;
-	}
-	
+        // Special case: ELSE / ELSEIF are at the same level as the IF.
+        if ($type === 'ELSE' || $type === 'ELSEIF') {
+            $currentTab = max(0, $currentTab - 1);
+        }
 
-	/**
-	* Method to create a single token.
-	* @param $type : token type
-	* @param $content : token content
-	*/
-	public function createToken($type="", $content="") {
+        if ($content === '' && $type === 'HTML') {
+            return true; // skip empty HTML tokens
+        }
 
-		$type = strtoupper($type);
-		$ctab = $this->tab;
-		
-		// handling tabs
-		if (in_array($type, array_keys($this->blockEnds))) {
-			$this->tab++;
-		}
+        $this->tokens[] = [
+            'type'    => $type,
+            'content' => $content,
+            'tab'     => $currentTab,
+        ];
 
-		if (in_array($type, $this->blockEnds) && $ctab > 0) {
-			$this->tab--;
-			$ctab--;
-		}
+        return true;
+    }
 
-		/* Special case for IF statement */
+    /**
+     * Create a token from a code block's raw content.
+     *
+     * @param string $content Code block contents.
+     */
+    public function doToken(string $content = ''): void
+    {
+        $tokenType = $this->findCodeType($content);
+        $tokenContent = $this->findCodeContent($content);
+        $this->createToken($tokenType, $tokenContent);
+    }
 
-		if ($type == "ELSE" || $type == "ELSEIF") {
-			$ctab--;
-		}
+    /**
+     * Extract the token type (first word) from a code block.
+     *
+     * @param string $codeBlock
+     * @return string
+     */
+    public function findCodeType(string $codeBlock): string
+    {
+        $codeBlock = trim($codeBlock);
+        $parts = explode(' ', $codeBlock, 2);
+        return strtoupper($parts[0]);
+    }
 
-
-		// appending token to tokens
-		$this->tokens[] = [
-			"type" => $type,
-			"content" => $content,
-			"tab" => $ctab
-		];
-
-		return true;
-	
-	}
-
-	/**
-	* Method to create token
-	* @param $content : code block contents
-	*/
-	public function doToken($content="") {
-		$token_type = $this->findCodeType($content);
-		$token_content = $this->findCodeContent($content);
-		$this->createToken($token_type, $token_content);
-	}
-
-
-	/**
-	* Method to find token type
-	* @param $codeBlock : code block contents
-	*/
-	public function findCodeType($codeBlock) {
-		$codeBlock = ltrim(rtrim($codeBlock, " ")," ");
-		$arr = explode(" ", $codeBlock);
-		return strtoupper($arr[0]); 
-	}
-
-	/**
-	* Method to find token content
-	* @param $codeBlock : code block contents
-	*/
-	public function findCodeContent($codeBlock) {
-		$codeBlock = ltrim(rtrim($codeBlock, " ")," ");
-		$arr = explode(" ", $codeBlock);
-		$content = "";
-		$i = 0;
-		foreach ($arr as $cnt) {
-			if ($i!=0) {
-				$content .= " " .$cnt;
-			}
-			$i += 1;
-		}
-		return ltrim($content, " ");
-	}
-
-
+    /**
+     * Extract the token content (everything after the first word) from a code block.
+     *
+     * @param string $codeBlock
+     * @return string
+     */
+    public function findCodeContent(string $codeBlock): string
+    {
+        $codeBlock = trim($codeBlock);
+        $parts = explode(' ', $codeBlock, 2);
+        return isset($parts[1]) ? trim($parts[1]) : '';
+    }
 }

@@ -1,368 +1,429 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Transfiguration\Core;
 
-use transfiguration\Core\Hooks;
+use Transfiguration\Core\Hooks;
 use Transfiguration\Helpers\Evaluator;
 use Transfiguration\Transfiguration;
 
 /**
-* Class for translating code tokens to html tokens
-*/
-class Parser {
-
-	// Initialising variables
-	public $toks = [];
-	public $tokens = [];
-	public $Evaluator;
-	public $hooker;
-
-	//public $hooks = []; // variables for transfiguration hooks
-
-	public $blockEnds = [
-		"FOR" => "ENDFOR",
-		"WHILE" => "ENDWHILE",
-		"IF" => "ENDIF"
-	];
-	
-	public $base_include_path = "";
-
-	/**
-	* Default method for getting variables and instantiating evaluator object 
-	*/ 
-	function __construct($tokens = [], $data=[], $path="", $hooks = []) {
-		$this->toks = $tokens;
-		$this->tokens = $tokens;
-		$this->Evaluator = new Evaluator($data); // instantiating evaluator object
-		$this->base_include_path = $path;
-		$this->hooks = new Hooks($hooks);
-		$this->ParseTokens();
-	}
-
-
-	/**
-	* Method to translate code tokens to html tokens
-	*/
-	public function parseTokens() {
-
-
-		$i=0;
-		while ($i<count($this->tokens)) {
-
-			$token = $this->tokens[$i];
-			$token_data = isset($token['data']) ? $token['data'] : [];
-
-			switch (strtoupper($token['type'])) {
-
-				case 'INCLUDE':
-
-					$this->include($token,$i);
-					break;
-				
-				case 'REQUIRE':
-
-					$this->include($token,$i);
-					break;
-
-				case 'ECHO':
-
-					$this->setToken($i, $this->Evaluator->evaluate($token["content"],$token_data));
-					break;
-
-				case 'PRINT':
-
-					$this->setToken($i, $this->Evaluator->evaluate($token["content"],$token_data));
-					break;
-
-				case "VAR":
-					$part = 1;
-					$varname = "";
-					$varcontent = "";
-					for( $c = 0; $c <= strlen($token['content']); $c++ ) {
-		    			$char = substr( $token['content'], $c, 1);
-
-		    			if ($part == 1) {
-		    				if ($char == "=") {
-		    					$part = 2;
-		    				} else {
-		    					$varname .= $char;
-		    				}
-		    			} elseif ($part == 2) {
-		    				$varcontent .= $char;
-		    			}
-
-					}
-					$this->Evaluator->setVar($varname, $varcontent, $token_data);
-					$this->removeToken($i);
-
-					break;
-
-
-				case "FOR":
-
-
-
-					// find ENDFOR position in tempalte.
-					$for_tokens = $this->findEnd($token, $i);
-
-					// split in 
-					$token_content_array = preg_split("/in/i", $token['content']);
-
-					// for variable
-					$for_key   = "";
-					$for_var = $token_content_array[0];
-					$for_var_array = $token_content_array[1];
-
-					//get for key var
-					if (count(explode(":", $for_var)) == 2) {
-						$for_var_explode = explode(":", $for_var);
-						$for_key = $for_var_explode[0];
-						$for_var = $for_var_explode[1];
-					}
-
-
-					$return_fors = $this->Evaluator->doFor($for_tokens, $for_var_array, $for_var, $for_key);
-					$this->appendTokens($i, $return_fors);
-
-					//recompile template from start
-					$i = 0;
-
-					break;
-
-
-				case "IF":
-
-					$found_endif = false;
-					$found_executable = false;
-					$executable_position = 0;
-
-					$step = $i;
-					while (!$found_endif&&!$found_executable&&$step<100000) {
-
-						$if_token = $this->tokens[$step];
-
-						if ($if_token['tab']==$token['tab']) {
-
-							switch (strtoupper($if_token['type'])) {
-								case 'IF':
-
-									if ($this->Evaluator->evaluate($if_token['content'], $token_data)) {
-										$executable_position = $step;
-										$found_executable = true;
-									}
-
-									break;
-
-								case 'ELSEIF':
-									if ($this->Evaluator->evaluate($if_token['content'], $token_data)) {
-										$executable_position = $step;
-										$found_executable = true;
-									}
-
-									break;
-								case "ELSE":
-									$executable_position = $step;
-									$found_executable = true;
-
-									break;
-								case "ENDIF":
-									$found_endif = true;
-									break;
-
-							}
-
-						}
-
-						$step++;
-					}
-
-					/*
-						Parse if
-					*/
-					$found_endif = false;
-					$step = $i;
-					$show = false;
-
-					while (!$found_endif&&$step<100000) {
-
-						if (!isset($this->tokens[$step])) continue;
-
-						$if_token = $this->tokens[$step];
-
-						if ($if_token['tab']==$token['tab']) {
-
-							switch (strtoupper($if_token['type'])) {
-								case 'IF':
-
-									if ($show) $show = false;
-
-									if ($executable_position == $step) $show = true;
-
-									$this->removeToken($step);
-
-									break;
-
-								case 'ELSEIF':
-
-									if ($show) $show = false;
-
-									if ($executable_position == $step) $show = true;
-
-									$this->removeToken($step);
-
-									break;
-								case "ELSE":
-
-									if ($show) $show = false;
-
-									if ($executable_position == $step) $show = true;
-
-									$this->removeToken($step);
-
-									break;
-								case "ENDIF":
-
-									if ($show) $show = false;
-
-									$found_endif = true;
-
-									$this->removeToken($step);
-
-									break;
-							}
-
-						}
-
-						if (!$show) {
-							$this->removeToken($step);
-						}
-
-						$step++;
-
-					}
-
-
-
-					break;
-
-				default:
-				
-					/**
-					* Start check hooks
-					*/
-
-					if ($token["type"] != "HTML") {
-						$result = $this->hooks->checkHooks($token,$this->Evaluator->evaluate($token["content"],$token_data));
-						if ($result) $this->setToken($i, $result);
-					}
-
-					/**
-					* End check hooks
-					*/
-
-					break;
-			}
-
-
-
-
-			$i += 1;
-		}
-
-
-
-	}
-
-	/**
-	* Method to require a transfiguartion template to corrent template
-	*/
-	public function include($token=[], $i=-1) {
-		
-		$token_data = isset($token['data']) ? $token['data'] : [];
-
-		$require_path = $this->Evaluator->evaluate($token['content'], $token_data);
-		$require_path = $this->base_include_path.  $require_path;
-
-		if (file_exists($require_path)) {
-			$content = file_get_contents($require_path);
-			$temp_data = array_merge($this->Evaluator->data, $token_data);
-			$transfig = new Transfiguration($content, $temp_data, $this->base_include_path);
-			$inc_tokens = $transfig->parserTokens();
-			$this->appendTokens($i,$inc_tokens);
-		}
-	}
-
-	/**
-	* Method to find if,for,etc end
-	*/
-	public function findEnd($token=[], $position) {
-
-		$start_keyword = $token['type'];
-		$end_keyword   = $this->blockEnds[$start_keyword];
-
-		$found_end     = false;
-		$loop_tokens   = [];
-		$step          = $position;
-
-		while (!$found_end && isset($this->tokens[$step]) && $step < 100000) {
-
-			$loop_token = $this->tokens[$step];
-
-			if ($loop_token['tab'] == $token['tab']) {
-				if ($loop_token['type'] == $end_keyword) $found_end = true;
-			}
-
-			if ($step != $position && !$found_end) {
-				$loop_tokens[] = $loop_token;
-			}
-			$this->removeToken($step);
-			$step++;
-		}
-
-
-		return $loop_tokens;
-	}
-
-	/**
-	* Method to append tokens in a position
-	*/
-	public function appendTokens($position=0, $token=[]) {
-
-		$array_part1 = array_slice($this->tokens, 0, $position);
-		$array_part2 = array_slice($this->tokens, $position+1, count($this->tokens)-1);
-
-		$ret_array = array_merge($array_part1, $token);
-		$ret_array = array_merge($ret_array, $array_part2);
-
-		$this->tokens = $ret_array;
-	}
-
-	/**
-	* Method to remove token in a position
-	*/
-	public function removeToken($position) {
-		$this->tokens[$position] = [
-			"type" => "HTML",
-			"content" => "",
-			"tab" => 0
-		];
-	}
-
-	/**
-	* Method to set token in a position
-	*/
-	public function setToken($position, $value) {
-		$this->tokens[$position] = [
-			"type" => "HTML",
-			"content" => $value,
-			"tab" => 0
-		];
-	}
-
-	/**
-	* Method to return tokens
-	*/
-	function exportTokens() {
-		return $this->tokens;
-	}
-
+ * Class for translating code tokens to HTML tokens.
+ */
+class Parser
+{
+    /** Maximum iterations to prevent infinite loops. */
+    private const MAX_ITERATIONS = 50000;
+
+    /** @var array<int, array> Original tokens. */
+    private $toks = [];
+
+    /** @var array<int, array> Working token list. */
+    private $tokens = [];
+
+    /** @var Evaluator */
+    private $evaluator;
+
+    /** @var Hooks */
+    private $hooks;
+
+    /** @var array<string, string> Block-type to end-keyword mapping. */
+    private $blockEnds = [
+        'FOR'   => 'ENDFOR',
+        'WHILE' => 'ENDWHILE',
+        'IF'    => 'ENDIF',
+    ];
+
+    /** @var string Base path for include/require resolution. */
+    private $baseIncludePath = '';
+
+    /**
+     * @param array<int, array> $tokens
+     * @param array<string, mixed> $data
+     * @param string $path Base path for include/require.
+     * @param array<string, array> $hooks
+     */
+    public function __construct(array $tokens = [], array $data = [], string $path = '', array $hooks = [])
+    {
+        $this->toks = $tokens;
+        $this->tokens = $tokens;
+        $this->evaluator = new Evaluator($data);
+        $this->baseIncludePath = $this->normalizePath($path);
+        $this->hooks = new Hooks($hooks);
+        $this->parseTokens();
+    }
+
+    /**
+     * Translate code tokens to HTML tokens.
+     */
+    public function parseTokens(): void
+    {
+        $i = 0;
+        $iterations = 0;
+        $tokenCount = count($this->tokens);
+
+        while ($i < $tokenCount && $iterations < self::MAX_ITERATIONS) {
+            $iterations++;
+
+            if (!isset($this->tokens[$i])) {
+                $i++;
+                continue;
+            }
+
+            $token = $this->tokens[$i];
+            $tokenType = strtoupper((string)($token['type'] ?? ''));
+            $tokenData = isset($token['data']) && is_array($token['data']) ? $token['data'] : [];
+
+            switch ($tokenType) {
+                case 'INCLUDE':
+                case 'REQUIRE':
+                    $this->includeTemplate($token, $i);
+                    break;
+
+                case 'ECHO':
+                case 'PRINT':
+                    $this->setToken($i, $this->evaluator->evaluate((string)$token['content'], $tokenData));
+                    break;
+
+                case 'VAR':
+                    $this->handleVarToken($token, $i, $tokenData);
+                    break;
+
+                case 'FOR':
+                    $returnFors = $this->handleForToken($token, $i);
+                    $this->appendTokens($i, $returnFors);
+                    // Recompile from start after token injection.
+                    $i = 0;
+                    $tokenCount = count($this->tokens);
+                    continue 2;
+
+                case 'IF':
+                    $this->handleIfBlock($token, $i, $tokenData);
+                    break;
+
+                default:
+                    // Check hooks for non-HTML tokens.
+                    if ($tokenType !== 'HTML') {
+                        $evaluatedContent = $this->evaluator->evaluate(
+                            (string)($token['content'] ?? ''),
+                            $tokenData
+                        );
+                        $result = $this->hooks->checkHooks($token, (string)$evaluatedContent);
+                        if ($result !== false) {
+                            $this->setToken($i, $result);
+                        }
+                    }
+                    break;
+            }
+
+            $i++;
+        }
+    }
+
+    /**
+     * Handle VAR token: parse variable assignment and store it.
+     */
+    private function handleVarToken(array $token, int $index, array $tokenData): void
+    {
+        $content = (string)($token['content'] ?? '');
+        $eqPos = strpos($content, '=');
+
+        if ($eqPos === false) {
+            $this->removeToken($index);
+            return;
+        }
+
+        $varName = trim(substr($content, 0, $eqPos));
+        $varContent = trim(substr($content, $eqPos + 1));
+
+        $this->evaluator->setVar($varName, $varContent, $tokenData);
+        $this->removeToken($index);
+    }
+
+    /**
+     * Handle FOR token: extract loop body and produce expanded tokens.
+     *
+     * @return array<int, array>
+     */
+    private function handleForToken(array $token, int $index): array
+    {
+        $forTokens = $this->findEnd($token, $index);
+
+        $contentParts = preg_split('/\s+in\s+/i', (string)$token['content'], 2);
+        if (count($contentParts) < 2) {
+            return [];
+        }
+
+        $forVarPart = trim($contentParts[0]);
+        $forArrayExpr = trim($contentParts[1]);
+
+        $forKey = '';
+        $forVar = $forVarPart;
+        if (strpos($forVarPart, ':') !== false) {
+            [$forKey, $forVar] = explode(':', $forVarPart, 2);
+            $forKey = trim($forKey);
+            $forVar = trim($forVar);
+        }
+
+        return $this->evaluator->doFor($forTokens, $forArrayExpr, $forVar, $forKey);
+    }
+
+    /**
+     * Handle IF/ELSEIF/ELSE/ENDIF block resolution.
+     */
+    private function handleIfBlock(array $token, int $startIndex, array $tokenData): void
+    {
+        $tab = (int)($token['tab'] ?? 0);
+
+        // Phase 1: find which branch is executable.
+        $executablePosition = $this->findExecutableBranch($startIndex, $tab, $tokenData);
+
+        // Phase 2: remove all non-executed tokens in this block.
+        $this->cleanIfBlock($startIndex, $tab, $executablePosition);
+    }
+
+    /**
+     * Find the position of the first true IF/ELSEIF or the ELSE branch.
+     */
+    private function findExecutableBranch(int $startIndex, int $tab, array $tokenData): int
+    {
+        $step = $startIndex;
+        $iterations = 0;
+
+        while (isset($this->tokens[$step]) && $iterations < self::MAX_ITERATIONS) {
+            $iterations++;
+            $ifToken = $this->tokens[$step];
+
+            if (((int)($ifToken['tab'] ?? -1)) !== $tab) {
+                $step++;
+                continue;
+            }
+
+            $type = strtoupper((string)($ifToken['type'] ?? ''));
+
+            switch ($type) {
+                case 'IF':
+                case 'ELSEIF':
+                    if ($this->evaluator->evaluate((string)$ifToken['content'], $tokenData)) {
+                        return $step;
+                    }
+                    break;
+                case 'ELSE':
+                    return $step;
+                case 'ENDIF':
+                    return $startIndex; // fallback: show nothing
+            }
+
+            $step++;
+        }
+
+        return $startIndex;
+    }
+
+    /**
+     * Remove all tokens in the IF block except the executable branch content.
+     */
+    private function cleanIfBlock(int $startIndex, int $tab, int $executablePosition): void
+    {
+        $step = $startIndex;
+        $show = false;
+        $iterations = 0;
+        $ended = false;
+
+        while (isset($this->tokens[$step]) && !$ended && $iterations < self::MAX_ITERATIONS) {
+            $iterations++;
+            $ifToken = $this->tokens[$step];
+
+            if (((int)($ifToken['tab'] ?? -1)) === $tab) {
+                $type = strtoupper((string)($ifToken['type'] ?? ''));
+
+                switch ($type) {
+                    case 'IF':
+                    case 'ELSEIF':
+                    case 'ELSE':
+                        $show = ($step === $executablePosition);
+                        $this->removeToken($step);
+                        break;
+
+                    case 'ENDIF':
+                        $show = false;
+                        $ended = true;
+                        $this->removeToken($step);
+                        break;
+                }
+            }
+
+            if (!$show && !$ended) {
+                $this->removeToken($step);
+            }
+
+            $step++;
+        }
+    }
+
+    /**
+     * Include/require another template with path traversal protection.
+     */
+    public function includeTemplate(array $token = [], int $index = -1): void
+    {
+        $tokenData = isset($token['data']) && is_array($token['data']) ? $token['data'] : [];
+
+        $relativePath = (string)$this->evaluator->evaluate((string)$token['content'], $tokenData);
+
+        // Resolve and validate the path to prevent directory traversal.
+        $resolvedPath = $this->resolveIncludePath($relativePath);
+
+        if ($resolvedPath === null || !file_exists($resolvedPath)) {
+            return;
+        }
+
+        $content = file_get_contents($resolvedPath);
+        if ($content === false) {
+            return;
+        }
+
+        $tempData = array_merge($this->evaluator->getData(), $tokenData);
+        $transfig = new Transfiguration($content, $tempData, $this->baseIncludePath);
+        $incTokens = $transfig->parserTokens();
+        $this->appendTokens($index, $incTokens);
+    }
+
+    /**
+     * Resolve an include path safely, preventing directory traversal.
+     *
+     * @param string $relativePath The requested relative path.
+     * @return string|null The resolved absolute path, or null if invalid.
+     */
+    private function resolveIncludePath(string $relativePath): ?string
+    {
+        // Remove any null bytes (poison byte attack).
+        $relativePath = str_replace("\0", '', $relativePath);
+
+        // Build the candidate path.
+        $candidatePath = $this->baseIncludePath . $relativePath;
+
+        // Resolve to absolute, canonical form.
+        $realPath = realpath($candidatePath);
+
+        if ($realPath === false) {
+            return null;
+        }
+
+        // Ensure the resolved path is still within the base include directory.
+        $baseRealPath = realpath($this->baseIncludePath);
+        if ($baseRealPath === false) {
+            return null;
+        }
+
+        // Check that resolved path starts with the base path.
+        if (strpos($realPath, $baseRealPath) !== 0) {
+            return null;
+        }
+
+        return $realPath;
+    }
+
+    /**
+     * Find the end of a block (FOR/WHILE/IF) and extract its body tokens.
+     *
+     * @param array $token The opening block token.
+     * @param int $position The token's index.
+     * @return array<int, array> Body tokens between start and end.
+     */
+    public function findEnd(array $token, int $position): array
+    {
+        $startKeyword = (string)($token['type'] ?? '');
+        $endKeyword = $this->blockEnds[$startKeyword] ?? '';
+        $tab = (int)($token['tab'] ?? 0);
+
+        $loopTokens = [];
+        $step = $position;
+        $foundEnd = false;
+        $iterations = 0;
+
+        while (!$foundEnd && isset($this->tokens[$step]) && $iterations < self::MAX_ITERATIONS) {
+            $iterations++;
+            $loopToken = $this->tokens[$step];
+
+            if (((int)($loopToken['tab'] ?? -1)) === $tab
+                && strtoupper((string)($loopToken['type'] ?? '')) === $endKeyword
+            ) {
+                $foundEnd = true;
+            }
+
+            if ($step !== $position && !$foundEnd) {
+                $loopTokens[] = $loopToken;
+            }
+
+            $this->removeToken($step);
+            $step++;
+        }
+
+        return $loopTokens;
+    }
+
+    /**
+     * Append tokens at a specific position in the token list.
+     *
+     * @param int $position
+     * @param array<int, array> $tokens
+     */
+    public function appendTokens(int $position = 0, array $tokens = []): void
+    {
+        $part1 = array_slice($this->tokens, 0, $position);
+        $part2 = array_slice($this->tokens, $position + 1);
+
+        $this->tokens = array_merge($part1, $tokens, $part2);
+    }
+
+    /**
+     * Replace a token at the given position with an empty HTML token (soft delete).
+     *
+     * @param int $position
+     */
+    public function removeToken(int $position): void
+    {
+        $this->tokens[$position] = [
+            'type'    => 'HTML',
+            'content' => '',
+            'tab'     => 0,
+        ];
+    }
+
+    /**
+     * Replace a token at the given position with an HTML token carrying the value.
+     *
+     * @param int $position
+     * @param mixed $value
+     */
+    public function setToken(int $position, $value): void
+    {
+        $this->tokens[$position] = [
+            'type'    => 'HTML',
+            'content' => (string)$value,
+            'tab'     => 0,
+        ];
+    }
+
+    /**
+     * Normalize a directory path to ensure trailing separator.
+     */
+    private function normalizePath(string $path): string
+    {
+        if ($path === '') {
+            return '';
+        }
+        return rtrim($path, '/\\') . DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * Export the final token list.
+     *
+     * @return array<int, array>
+     */
+    public function exportTokens(): array
+    {
+        return $this->tokens;
+    }
 }
