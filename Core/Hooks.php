@@ -28,6 +28,16 @@ class Hooks
     }
 
     /**
+     * Return all registered hooks.
+     *
+     * @return array<string, array{method: callable}>
+     */
+    public function getHooks(): array
+    {
+        return $this->hooks;
+    }
+
+    /**
      * Check if a token matches a registered hook and return the hook's result.
      *
      * @param array{type?: string, content?: string, tab?: int} $token

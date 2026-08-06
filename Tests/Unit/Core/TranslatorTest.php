@@ -1,34 +1,24 @@
-<?php 
+<?php
+
 use PHPUnit\Framework\TestCase;
 
+use Transfiguration\Core\Compiler;
+use Transfiguration\Core\Hooks;
+use Transfiguration\Core\ASTNodeList;
+use Transfiguration\Core\TextNode;
 
-use Transfiguration\Core\Translator;
+class TranslatorTest extends TestCase
+{
+    /**
+     * Test that the Compiler correctly concatenates HTML text nodes.
+     */
+    public function testCompilerReturnsCorrectOutputFromAST(): void
+    {
+        $ast = new ASTNodeList();
+        $ast->add(new TextNode('hello, world!'));
 
+        $compiler = new Compiler([], new Hooks([]));
 
-class TranslatorTest extends TestCase {
-
-	/**
-	* Test translator translates correctly tokens
-	*/
-	public function testTranslatorReturnsCorrectTranslationFromTokens() {
-
-		// Create test tokens to translate
-		$translator = new Translator([
-			[
-				"type" => "HTML",
-				"content" => "hello, world!",
-				"tab" => ""
-			],
-			[
-				"type" => "ECHO",
-				"content" => "1",
-				"tab" => ""
-			]
-		]);
-
-		// check translation result.
-		$this->assertEquals($translator->translate(), "hello, world!");
-
-	}
-
+        $this->assertEquals('hello, world!', $compiler->compile($ast));
+    }
 }

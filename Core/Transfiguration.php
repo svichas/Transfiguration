@@ -5,51 +5,52 @@ declare(strict_types=1);
 namespace Transfiguration;
 
 use Transfiguration\Core\Lexer;
-use Transfiguration\Core\Translator;
 use Transfiguration\Core\Parser;
+use Transfiguration\Core\Compiler;
+use Transfiguration\Core\Hooks;
+use Transfiguration\Core\ASTNodeList;
 
 /**
  * Transfiguration main class — lightweight PHP template engine.
+ *
+ * Pipeline:  template string → Lexer → Parser → AST → Compiler → HTML
  */
 class Transfiguration
 {
     /** @var string Base path for include/require resolution. */
-    private $includePath = '';
-
-    /** @var Parser|null Cached parser instance. */
-    private $parser;
+    private string $includePath = '';
 
     /** @var array<string, array{method: callable}> Registered hooks. */
-    private $hooks = [];
+    private array $hooks = [];
 
     /** @var array<string, mixed> Template variable bindings. */
-    private $data = [];
+    private array $data = [];
 
     /** @var string Raw template HTML. */
-    private $html = '';
+    private string $html = '';
+
+    /** @var ASTNodeList|null Cached AST (invalidated on mutation). */
+    private ?ASTNodeList $ast = null;
 
     /**
-     * @param string $html Transfiguration template source.
+     * @param string              $html Template source.
      * @param array<string, mixed> $data Template variables.
-     * @param string $path Base path for include/require.
+     * @param string              $path Base path for include/require.
      */
     public function __construct(string $html = '', array $data = [], string $path = '')
     {
-        $this->html = $html;
-        $this->data = $data;
+        $this->html        = $html;
+        $this->data        = $data;
         $this->includePath = $path;
     }
 
     /**
      * Set the template HTML source.
-     *
-     * @param string $html
-     * @return $this
      */
     public function html(string $html = ''): self
     {
         $this->html = $html;
-        $this->parser = null; // invalidate cached parser
+        $this->ast  = null;
         return $this;
     }
 
@@ -57,83 +58,80 @@ class Transfiguration
      * Set template variable bindings.
      *
      * @param array<string, mixed> $data
-     * @return $this
      */
     public function data(array $data = []): self
     {
         $this->data = $data;
-        $this->parser = null;
         return $this;
     }
 
     /**
      * Set the base path for include/require resolution.
-     *
-     * @param string $path
-     * @return $this
      */
     public function requirePath(string $path = ''): self
     {
         $this->includePath = $path;
-        $this->parser = null;
+        $this->ast = null;
         return $this;
     }
 
     /**
      * Register a hook for a custom token type.
      *
-     * @param string $hook Token type name (case-insensitive).
+     * @param string   $hook   Token type name (case-insensitive).
      * @param callable $method Callback receiving content string.
-     * @return $this
      */
     public function hook(string $hook = '', callable $method = null): self
     {
-        $this->hooks[strtoupper($hook)] = [
-            'method' => $method,
-        ];
-        $this->parser = null;
+        $this->hooks[strtoupper($hook)] = ['method' => $method];
+        $this->ast = null;
         return $this;
     }
 
     /**
-     * Parse the template and return the token list.
+     * Build (or return cached) AST from the template source.
+     */
+    private function getAST(): ASTNodeList
+    {
+        if ($this->ast === null) {
+            $lexer      = new Lexer($this->html);
+            $hooks      = new Hooks($this->hooks);
+            $parser     = new Parser($lexer->exportTokens(), $hooks);
+            $this->ast  = $parser->parse();
+        }
+
+        return $this->ast;
+    }
+
+    /**
+     * Return the parsed token list (for internal use by include).
      *
      * @return array<int, array>
      */
     public function parserTokens(): array
     {
-        if ($this->parser === null) {
-            $lexer = new Lexer($this->html);
-            $this->parser = new Parser(
-                $lexer->exportTokens(),
-                $this->data,
-                $this->includePath,
-                $this->hooks
-            );
-        }
-        return $this->parser->exportTokens();
+        // Legacy API — used by Compiler::includeTemplate when
+        // recursively including templates.  Return the raw tokens
+        // so the caller can parse them with its own Parser+Hooks.
+        $lexer = new Lexer($this->html);
+        return $lexer->exportTokens();
     }
 
     /**
      * Export the rendered template as a string.
-     *
-     * @return string
      */
     public function export(): string
     {
-        $translator = new Translator($this->parserTokens());
-        return $translator->translate();
+        $compiler = new Compiler($this->data, new Hooks($this->hooks), $this->includePath);
+        return $compiler->compile($this->getAST());
     }
 
     /**
      * Render (echo) the template and return $this for chaining.
-     *
-     * @return $this
      */
     public function render(): self
     {
-        $translator = new Translator($this->parserTokens());
-        echo $translator->translate();
+        echo $this->export();
         return $this;
     }
 }

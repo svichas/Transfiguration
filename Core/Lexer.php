@@ -11,9 +11,8 @@ class Lexer
 {
     /** @var array<string, string> Block-type to end-keyword mapping. */
     private $blockEnds = [
-        'FOR'   => 'ENDFOR',
-        'WHILE' => 'ENDWHILE',
-        'IF'    => 'ENDIF',
+        'FOR' => 'ENDFOR',
+        'IF'  => 'ENDIF',
     ];
 
     /** @var string Raw input HTML/template. */
@@ -112,12 +111,8 @@ class Lexer
 
     /**
      * Create a single token and append it to the list.
-     *
-     * @param string $type Token type.
-     * @param string $content Token content.
-     * @return bool
      */
-    public function createToken(string $type = '', string $content = ''): bool
+    private function createToken(string $type = '', string $content = ''): bool
     {
         $type = strtoupper($type);
         $currentTab = $this->tab;
@@ -153,23 +148,25 @@ class Lexer
 
     /**
      * Create a token from a code block's raw content.
-     *
-     * @param string $content Code block contents.
+     * Skips empty blocks like {{ }}.
      */
-    public function doToken(string $content = ''): void
+    private function doToken(string $content = ''): void
     {
-        $tokenType = $this->findCodeType($content);
+        $content = trim($content);
+
+        if ($content === '') {
+            return; // skip {{ }}
+        }
+
+        $tokenType    = $this->findCodeType($content);
         $tokenContent = $this->findCodeContent($content);
         $this->createToken($tokenType, $tokenContent);
     }
 
     /**
      * Extract the token type (first word) from a code block.
-     *
-     * @param string $codeBlock
-     * @return string
      */
-    public function findCodeType(string $codeBlock): string
+    private function findCodeType(string $codeBlock): string
     {
         $codeBlock = trim($codeBlock);
         $parts = explode(' ', $codeBlock, 2);
@@ -178,11 +175,8 @@ class Lexer
 
     /**
      * Extract the token content (everything after the first word) from a code block.
-     *
-     * @param string $codeBlock
-     * @return string
      */
-    public function findCodeContent(string $codeBlock): string
+    private function findCodeContent(string $codeBlock): string
     {
         $codeBlock = trim($codeBlock);
         $parts = explode(' ', $codeBlock, 2);
