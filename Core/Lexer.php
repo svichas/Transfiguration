@@ -5,31 +5,23 @@ declare(strict_types=1);
 namespace Transfiguration\Core;
 
 /**
- * Class for translating plain text (Transfiguration code) to tokens.
+ * Translates plain text (Transfiguration code) into a flat token stream.
  */
 class Lexer
 {
     /** @var array<string, string> Block-type to end-keyword mapping. */
-    private $blockEnds = [
+    private array $blockEnds = [
         'FOR' => 'ENDFOR',
         'IF'  => 'ENDIF',
     ];
 
-    /** @var string Raw input HTML/template. */
-    private $html = '';
+    /** @var array<int, array{type: string, content: string, tab: int}> */
+    private array $tokens = [];
 
-    /** @var array<int, array{type: string, content: string, tab: int}> Generated tokens. */
-    private $tokens = [];
+    private int $tab = 0;
 
-    /** @var int Current nesting depth for closing tags. */
-    private $tab = 0;
-
-    /**
-     * @param string $html Template source to lex.
-     */
-    public function __construct(string $html = '')
+    public function __construct(private string $html = '')
     {
-        $this->html = $html;
         $this->createTokens();
     }
 

@@ -18,6 +18,8 @@ require __DIR__ . '/Core/Hooks.php';
 require __DIR__ . '/Core/Lexer.php';
 require __DIR__ . '/Core/AST.php';
 require __DIR__ . '/Core/Parser.php';
-require __DIR__ . '/Core/Translator.php';   // Compiler (was Translator)
+require __DIR__ . '/Core/Translator.php';   // Compiler
 require __DIR__ . '/Core/Transfiguration.php';
+require __DIR__ . '/Helpers/ExpressionParser.php';
 require __DIR__ . '/Helpers/Evaluator.php';
+require __DIR__ . '/Helpers/Sanitizer.php';

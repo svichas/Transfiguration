@@ -11,38 +11,22 @@ use Transfiguration\Core\Hooks;
 use Transfiguration\Core\ASTNodeList;
 
 /**
- * Transfiguration main class — lightweight PHP template engine.
+ * Transfiguration — lightweight PHP template engine.
  *
  * Pipeline:  template string → Lexer → Parser → AST → Compiler → HTML
  */
 class Transfiguration
 {
-    /** @var string Base path for include/require resolution. */
-    private string $includePath = '';
-
-    /** @var array<string, array{method: callable}> Registered hooks. */
+    /** @var array<string, array{method: callable}> */
     private array $hooks = [];
 
-    /** @var array<string, mixed> Template variable bindings. */
-    private array $data = [];
-
-    /** @var string Raw template HTML. */
-    private string $html = '';
-
-    /** @var ASTNodeList|null Cached AST (invalidated on mutation). */
     private ?ASTNodeList $ast = null;
 
-    /**
-     * @param string              $html Template source.
-     * @param array<string, mixed> $data Template variables.
-     * @param string              $path Base path for include/require.
-     */
-    public function __construct(string $html = '', array $data = [], string $path = '')
-    {
-        $this->html        = $html;
-        $this->data        = $data;
-        $this->includePath = $path;
-    }
+    public function __construct(
+        private string $html = '',
+        private array $data = [],
+        private string $includePath = '',
+    ) {}
 
     /**
      * Set the template HTML source.
@@ -81,7 +65,7 @@ class Transfiguration
      * @param string   $hook   Token type name (case-insensitive).
      * @param callable $method Callback receiving content string.
      */
-    public function hook(string $hook = '', callable $method = null): self
+    public function hook(string $hook = '', ?callable $method = null): self
     {
         $this->hooks[strtoupper($hook)] = ['method' => $method];
         $this->ast = null;

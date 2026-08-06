@@ -14,19 +14,16 @@ namespace Transfiguration\Core;
  */
 class Parser
 {
-    /** @var array<int, array{type: string, content: string, tab: int}> */
-    private array $tokens;
-
     /** @var array<string, true> Token types that have registered hooks. */
     private array $hookTypes;
 
     /**
-     * @param array<int, array> $tokens Flat token array from Lexer.
-     * @param Hooks|null        $hooks  Hook registry (may be empty).
+     * @param array<int, array{type: string, content: string, tab: int}> $tokens
      */
-    public function __construct(array $tokens, ?Hooks $hooks = null)
-    {
-        $this->tokens = $tokens;
+    public function __construct(
+        private array $tokens,
+        ?Hooks $hooks = null,
+    ) {
         $this->hookTypes = [];
 
         if ($hooks !== null) {
@@ -151,7 +148,9 @@ class Parser
 
         // First branch: IF body
         $condition = (string) $this->tokens[$pos - 1]['content'];
-        $branches[] = new IfBranch($condition, $this->parseBranchBody($pos, $tab));
+        $branches[] = new IfBranch($condition, $this->parseBranchBody(
+            $pos, $tab, ['ELSEIF' => true, 'ELSE' => true, 'ENDIF' => true]
+        ));
 
         // Subsequent branches: ELSEIF / ELSE
         while ($pos < count($this->tokens)) {
@@ -171,10 +170,14 @@ class Parser
             if ($type === 'ELSEIF') {
                 $condition = (string) $this->tokens[$pos]['content'];
                 $pos++; // consume ELSEIF
-                $branches[] = new IfBranch($condition, $this->parseBranchBody($pos, $tab));
+                $branches[] = new IfBranch($condition, $this->parseBranchBody(
+                    $pos, $tab, ['ELSEIF' => true, 'ELSE' => true, 'ENDIF' => true]
+                ));
             } elseif ($type === 'ELSE') {
                 $pos++; // consume ELSE
-                $branches[] = new IfBranch(null, $this->parseBranchBody($pos, $tab));
+                $branches[] = new IfBranch(null, $this->parseBranchBody(
+                    $pos, $tab, ['ENDIF' => true]
+                ));
             } else {
                 break; // safety
             }
@@ -192,11 +195,10 @@ class Parser
      *
      * Exit: $pos is left pointing at the delimiter token.
      */
-    private function parseBranchBody(int &$pos, int $tab): ASTNodeList
+    private function parseBranchBody(int &$pos, int $tab, array $stopTypes): ASTNodeList
     {
         $list = new ASTNodeList();
         $len  = count($this->tokens);
-        $stopTypes = ['ELSEIF' => true, 'ELSE' => true, 'ENDIF' => true];
 
         while ($pos < $len) {
             $token = $this->tokens[$pos];
@@ -251,12 +253,14 @@ class Parser
 
         if (strpos($forExpr, ':') !== false) {
             [$keyVar, $valueVar] = explode(':', $forExpr, 2);
-            $keyVar   = trim($keyVar);
-            $valueVar = trim($valueVar);
+            $keyVar   = ltrim(trim($keyVar), '$');
+            $valueVar = ltrim(trim($valueVar), '$');
+        } else {
+            $valueVar = ltrim($valueVar, '$');
         }
 
         // Parse body until ENDFOR at the same tab level.
-        $body = $this->parseBranchBody($pos, $tab);
+        $body = $this->parseBranchBody($pos, $tab, ['ENDFOR' => true]);
 
         // $pos is now at ENDFOR
         return new ForNode($keyVar, $valueVar, $arrayExpr, $body);

@@ -8,40 +8,25 @@ use Transfiguration\Helpers\Evaluator;
 
 /**
  * Walks the AST and produces the final HTML string.
- *
- * The Compiler is the "runtime" of the template engine.  It holds
- * the variable state (via Evaluator), a scope stack for loops,
- * hook callbacks, and the include-path resolver.
  */
 class Compiler
 {
-    /** @var Evaluator */
     private Evaluator $evaluator;
 
-    /** @var Hooks */
-    private Hooks $hooks;
-
-    /** @var string Base directory for include/require resolution. */
-    private string $basePath;
-
-    /**
-     * Scope stack for loop variables.
-     * Each entry is array<string, mixed> pushed/popped around FOR bodies.
-     *
-     * @var array<int, array<string, mixed>>
-     */
+    /** @var array<int, array<string, mixed>> Scope stack for loop variables. */
     private array $scopeStack = [];
 
     /**
-     * @param array<string, mixed> $data     Template variable bindings.
-     * @param Hooks                $hooks    Registered hook callbacks.
+     * @param array<string, mixed> $data  Template variable bindings.
      * @param string               $basePath Base directory for includes.
      */
-    public function __construct(array $data, Hooks $hooks, string $basePath = '')
-    {
+    public function __construct(
+        array $data,
+        private Hooks $hooks,
+        private string $basePath = '',
+    ) {
         $this->evaluator = new Evaluator($data);
-        $this->hooks     = $hooks;
-        $this->basePath  = $this->normalizePath($basePath);
+        $this->basePath   = $this->normalizePath($basePath);
     }
 
     // ────────────────────────────────────────────────────────
@@ -76,13 +61,10 @@ class Compiler
 
     /**
      * Evaluate a template expression, respecting the current scope stack.
-     *
-     * @return mixed
      */
-    public function evaluate(string $expression)
+    public function evaluate(string $expression): mixed
     {
-        $scopedData = $this->flattenScope();
-        return $this->evaluator->evaluate($expression, $scopedData);
+        return $this->evaluator->evaluate($expression, $this->flattenScope());
     }
 
     /**

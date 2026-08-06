@@ -6,14 +6,9 @@ namespace Transfiguration\Core;
 
 /**
  * Base class for all AST nodes in the template tree.
- *
- * Each node knows how to compile itself given a Compiler context.
  */
 abstract class ASTNode
 {
-    /**
-     * Compile this node and return its HTML output.
-     */
     abstract public function compile(Compiler $compiler): string;
 }
 
@@ -44,7 +39,7 @@ class ASTNodeList
  */
 class TextNode extends ASTNode
 {
-    public function __construct(public string $content) {}
+    public function __construct(public readonly string $content) {}
 
     public function compile(Compiler $compiler): string
     {
@@ -57,7 +52,7 @@ class TextNode extends ASTNode
  */
 class EchoNode extends ASTNode
 {
-    public function __construct(public string $expression) {}
+    public function __construct(public readonly string $expression) {}
 
     public function compile(Compiler $compiler): string
     {
@@ -71,8 +66,8 @@ class EchoNode extends ASTNode
 class VarNode extends ASTNode
 {
     public function __construct(
-        public string $name,
-        public string $valueExpression
+        public readonly string $name,
+        public readonly string $valueExpression,
     ) {}
 
     public function compile(Compiler $compiler): string
@@ -87,7 +82,7 @@ class VarNode extends ASTNode
  */
 class IncludeNode extends ASTNode
 {
-    public function __construct(public string $pathExpression) {}
+    public function __construct(public readonly string $pathExpression) {}
 
     public function compile(Compiler $compiler): string
     {
@@ -101,8 +96,8 @@ class IncludeNode extends ASTNode
 class HookNode extends ASTNode
 {
     public function __construct(
-        public string $hookType,
-        public string $content
+        public readonly string $hookType,
+        public readonly string $content,
     ) {}
 
     public function compile(Compiler $compiler): string
@@ -122,11 +117,10 @@ class IfBranch
 {
     /**
      * @param string|null $condition Expression for IF/ELSEIF, or null for ELSE.
-     * @param ASTNodeList $body      Tokens inside this branch.
      */
     public function __construct(
-        public ?string $condition,
-        public ASTNodeList $body
+        public readonly ?string $condition,
+        public readonly ASTNodeList $body,
     ) {}
 }
 
@@ -136,7 +130,7 @@ class IfBranch
 class IfNode extends ASTNode
 {
     /** @param IfBranch[] $branches */
-    public function __construct(public array $branches) {}
+    public function __construct(public readonly array $branches) {}
 
     public function compile(Compiler $compiler): string
     {
@@ -155,10 +149,10 @@ class IfNode extends ASTNode
 class ForNode extends ASTNode
 {
     public function __construct(
-        public string $keyVar,       // '' when no key
-        public string $valueVar,
-        public string $arrayExpression,
-        public ASTNodeList $body
+        public readonly string $keyVar,
+        public readonly string $valueVar,
+        public readonly string $arrayExpression,
+        public readonly ASTNodeList $body,
     ) {}
 
     public function compile(Compiler $compiler): string

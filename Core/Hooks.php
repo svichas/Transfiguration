@@ -5,23 +5,15 @@ declare(strict_types=1);
 namespace Transfiguration\Core;
 
 /**
- * Class for transfiguration hooks to extend template functionality.
+ * Registry of callbacks for custom template tags.
  */
 class Hooks
 {
     /**
-     * Registered hooks keyed by uppercase token type.
-     *
-     * @var array<string, array{method: callable}>
-     */
-    private $hooks = [];
-
-    /**
      * @param array<string, array{method: callable}> $hooks
      */
-    public function __construct(array $hooks = [])
+    public function __construct(private array $hooks = [])
     {
-        // Normalize hook keys to uppercase.
         foreach ($hooks as $key => $hook) {
             $this->hooks[strtoupper($key)] = $hook;
         }
@@ -44,9 +36,9 @@ class Hooks
      * @param string $content The evaluated content to pass to the hook.
      * @return mixed The hook result, or false if no hook matched.
      */
-    public function checkHooks(array $token = [], string $content = '')
+    public function checkHooks(array $token = [], string $content = ''): mixed
     {
-        $tokenType = strtoupper((string)($token['type'] ?? ''));
+        $tokenType = strtoupper((string) ($token['type'] ?? ''));
 
         if (!isset($this->hooks[$tokenType])) {
             return false;

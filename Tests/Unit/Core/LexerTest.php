@@ -14,7 +14,7 @@ class LexerTest extends TestCase
         $lexer  = new Lexer('before {{ echo "hello" }} after {{ if $x }}inner{{ endif }} end');
         $tokens = $lexer->exportTokens();
 
-        $this->assertCount(6, $tokens);
+        $this->assertCount(7, $tokens);
 
         $this->assertEquals('HTML',   $tokens[0]['type']);
         $this->assertEquals('before ', $tokens[0]['content']);
@@ -32,21 +32,25 @@ class LexerTest extends TestCase
         $this->assertEquals('inner',  $tokens[4]['content']);
 
         $this->assertEquals('ENDIF', $tokens[5]['type']);
+
+        $this->assertEquals('HTML',  $tokens[6]['type']);
+		$this->assertEquals(' end',  $tokens[6]['content']);
     }
 
     /**
      * Test that comments are fully stripped from the token stream.
+     *
+     * Comments are removed inline — the surrounding HTML stays in one token.
      */
     public function testLexerStripsComments(): void
     {
         $lexer  = new Lexer('visible {# hidden comment #} visible');
         $tokens = $lexer->exportTokens();
 
-        $this->assertCount(2, $tokens);
+        // One HTML token with the comment removed (double space remains).
+        $this->assertCount(1, $tokens);
         $this->assertEquals('HTML', $tokens[0]['type']);
-        $this->assertEquals('HTML', $tokens[1]['type']);
-        $this->assertEquals('visible ', $tokens[0]['content']);
-        $this->assertEquals(' visible', $tokens[1]['content']);
+        $this->assertEquals('visible  visible', $tokens[0]['content']);
     }
 
     /**

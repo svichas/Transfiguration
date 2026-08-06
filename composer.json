@@ -1,15 +1,15 @@
 {
     "name": "transfiguration/transfiguration",
     "type": "library",
-    "description": "A light weight templating engine made with php.",
+    "description": "A lightweight, secure PHP template engine.",
     "license": "MIT",
     "require": {
-        "php": " ^7.0 || ^7.1 || ^7.2"
+        "php": "^8.0"
     },
     "autoload": {
         "files": ["Transfiguration.php"]
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.5"
+        "phpunit/phpunit": "^9.0 || ^10.0"
     }
 }
